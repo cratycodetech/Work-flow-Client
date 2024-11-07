@@ -50,31 +50,31 @@ const router = createBrowserRouter([
           path: "geo-fencing",
           element: <GeoFencing/>
         },
-        {
-          path: "mainPage",
-          element: <MainPage/>
-        },
-        {
-          path: "register",
-          element: <Register/>
-        },
-        {
-          path: "confirmRegister",
-          element: <ConfirmRegistration/>
-        },
-        {
-          path: "login",
-          element: <Login/>
-        },
-        {
-          path: "forget",
-          element: <ForgetPassword/>
-        },
-        {
-          path: "reset",
-          element: <ResetPassword/>
-        },
     ]
+  },
+  {
+    path: "mainPage",
+    element: <MainPage/>
+  },
+  {
+    path: "register",
+    element: <Register/>
+  },
+  {
+    path: "confirmRegister",
+    element: <ConfirmRegistration/>
+  },
+  {
+    path: "login",
+    element: <Login/>
+  },
+  {
+    path: "forget",
+    element: <ForgetPassword/>
+  },
+  {
+    path: "reset",
+    element: <ResetPassword/>
   },
 ]);
 

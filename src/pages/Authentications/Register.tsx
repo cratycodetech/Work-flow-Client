@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/button";
 import Lottie from "lottie-react";
 import mainAnimation from "../../assets/auth/mainAnimation.json"
-import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useAppDispatch } from "@/redux/hook";
+import { useSignUpMutation } from "@/redux/features/auth/authApi";
+import { setUser } from "@/redux/features/auth/authSlice";
 
 type TRegistrationFormData = {
     adminId: string
@@ -10,23 +14,26 @@ type TRegistrationFormData = {
 
 const Register = () => {
     const { register, handleSubmit } = useForm<TRegistrationFormData>();
+    const navigate = useNavigate()
+    const dispatch = useAppDispatch();
+    const [signUp] = useSignUpMutation()
 
      //handle registration
-  const onSubmit= async (data) => {
+  const onSubmit:SubmitHandler<TRegistrationFormData> = async (data) => {
     const toastId = toast.loading("Registering in");
 
-    // try {
-    //   const registerInfo = {
-    //     adminId: data.adminId,
-    //   };
+    try {
+      const registerInfo = {
+        adminId: data.adminId,
+      };
 
-    //   await registration(registerInfo).unwrap();
-    //   dispatch(setUser({ user: registerInfo }));
-    //   toast.success("Registration Done.", { id: toastId, duration: 2000 });
-    //   navigate("/");
-    // } catch (error) {
-    //   toast.error("Something went wrong!", { id: toastId, duration: 2000 });
-    // }
+      await signUp(registerInfo).unwrap();
+      dispatch(setUser({ user: registerInfo }));
+      toast.success("Go to Next Page.", { id: toastId, duration: 2000 });
+      navigate("/confirmRegister");
+    } catch (error) {
+      toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+    }
   };
 
     return (
