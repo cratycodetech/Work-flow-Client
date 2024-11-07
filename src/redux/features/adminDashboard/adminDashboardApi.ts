@@ -4,11 +4,11 @@ const adminDashboardApi = baseApi.injectEndpoints({
     endpoints: (builder) =>({
         getAllEmployee: builder.query({
             query: (employeeInfo) =>({
-                url: "/employee/all",
+                url: "/dashbroad/total",
                 method: "GET",
                 body: employeeInfo
             }),
-            providesTags: ['employee'],
+            providesTags: ['dashboard'],
         }),
     })
 })
