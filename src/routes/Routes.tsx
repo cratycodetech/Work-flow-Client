@@ -61,20 +61,12 @@ const router = createBrowserRouter([
     element: <Register/>
   },
   {
-    path: "confirmRegister",
-    element: <ConfirmRegistration/>
-  },
-  {
     path: "login",
     element: <Login/>
   },
   {
     path: "forget",
     element: <ForgetPassword/>
-  },
-  {
-    path: "reset",
-    element: <ResetPassword/>
   },
 ]);
 

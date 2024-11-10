@@ -1,51 +1,56 @@
 import { Button } from "@/components/ui/button";
 import Lottie from "lottie-react";
 import loginAnimation from "../../assets/auth/loginAnimation.json"
-import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import { FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
+import { toast } from "sonner";
+import { setUser } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
 
-type TRegistrationFormData = {
+type TLoginFormData = {
     email: string
     password: string
-    confirmPass: string
   }
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const { register, handleSubmit } = useForm<TRegistrationFormData>();
+    const { register, handleSubmit, formState: { errors } } = useForm<TLoginFormData>();
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const [login] = useLoginMutation();
 
     //handle show pass or not
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
       };
 
-     //handle registration
-  const onSubmit= async (data) => {
-    const toastId = toast.loading("Registering in");
-
-    // try {
-    //   const registerInfo = {
-    //     email: data.email,
-    //     password: data.password,
-    //     confirmPass: data.confirmPass,
-    //   };
-
-    //   await registration(registerInfo).unwrap();
-    //   dispatch(setUser({ user: registerInfo }));
-    //   toast.success("Registration Done.", { id: toastId, duration: 2000 });
-    //   navigate("/");
-    // } catch (error) {
-    //   toast.error("Something went wrong!", { id: toastId, duration: 2000 });
-    // }
+  //handle login
+  const onSubmit : SubmitHandler<TLoginFormData> = async (data) => {
+    const toastId = toast.loading("logging in");
+    try {
+      const loginInfo = {
+        email: data.email,
+        password: data.password,
+      };
+      
+      const res = await login(loginInfo).unwrap()
+      const token = res.token;
+      dispatch(setUser({user: loginInfo, token: token}))
+      toast.success("Login Done.", { id: toastId, duration: 2000 });
+      navigate("/");
+    } catch (error) {
+      toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+    }
   };
 
     return (
         <div>
             <div className="bg-[#F0F4FA]">
-                <div className="flex flex-col lg:flex-row justify-center items-center gap-10 max-w-[90%] lg:h-screen py-10 mx-auto p-2">
+                <div className="flex flex-col lg:flex-row justify-center items-center gap-10 max-w-[80%] lg:h-screen py-10 mx-auto p-2">
 
                 <div className="">
                     <div className="text-[#04080F] mb-5">
@@ -61,18 +66,21 @@ const Login = () => {
                           <input
                             className="shadow bg-[#C9C9C9] text-sm bg-opacity-15 rounded w-full py-3 px-3 text-[#04080F]"
                             type="email"
-                            {...register("email")}
+                            {...register("email", { required: "Email is required", pattern: { value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, message: "Invalid email address" } })}
                             name="email"
                             placeholder="Email"
                             required
                           />
+                          {errors.email && (
+                              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                            )}
                         </div>
                         <div className="mt-4">
                             <div className="flex justify-between">
                                 <label className="block mb-2 text-sm font-normal text-[#04080F]">
                                     Password
                                 </label>
-                              <a className="text-xs text-[#04080F] hover:underline">
+                              <a href="/forget" className="text-xs text-[#04080F] hover:underline">
                                 Forget Password?
                               </a>
                             </div>
@@ -92,12 +100,15 @@ const Login = () => {
                               <input
                                 className="shadow bg-[#C9C9C9] text-sm bg-opacity-15 rounded w-full py-3 px-3 text-[#04080F]"
                                 type={showPassword ? "text" : "password"}
-                                {...register("password")}
+                                {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be at least 6 characters long" } })}
                                 name="password"
                                 placeholder="Password"
                                 required
                               />
                             </div>
+                            {errors.password && (
+                              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                            )}
                         </div>
                 
                       <div className="pt-6">
@@ -110,7 +121,7 @@ const Login = () => {
                       <span className="text-base text-[text-[#04080F]] flex mx-auto">
                             Don’t have any account?{" "}
                         <Link
-                          to="/login"
+                          to="/register"
                           className="hover:text-slate-500 font-semibold text-[#463684] pl-2"
                         >
                            Register
@@ -131,7 +142,7 @@ const Login = () => {
 
                 <div className="">
                     <div className="w-full flex items-center justify-center lg:border-b lg:border-l lg:border-gray-300">
-                      <Lottie className="h-[500px]" animationData={loginAnimation} />
+                      <Lottie className="lg:h-[500px] md:h-[500px] h-full" animationData={loginAnimation} />
                     </div>
                 </div>
             </div>
