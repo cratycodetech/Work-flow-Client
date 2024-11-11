@@ -10,7 +10,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import { TRegistrationFormData } from "@/types/auth";
 import { useAppDispatch } from "@/redux/hook";
 import { useSignUpMutation } from "@/redux/features/auth/authApi";
-import { setUser } from "@/redux/features/auth/authSlice";
+import { setAdmin } from "@/redux/features/auth/authSlice";
 
 const Register = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -42,14 +42,13 @@ const Register = () => {
         adminId: data.adminId,
         email: data.email,
         password: data.password,
-        confirmPass: data.confirmPass,
+        confirmPassword: data.confirmPassword,
       };
 
-      const responseData = await signUp(registerInfo).unwrap();
-      console.log(responseData);
-      dispatch(setUser({ user: responseData }));
+      await signUp(registerInfo).unwrap();
+      dispatch(setAdmin({ admin: registerInfo }));
       toast.success("Registration complete.", { id: toastId, duration: 2000 });
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       toast.error("Something went wrong!", { id: toastId, duration: 2000 });
     }
@@ -162,13 +161,13 @@ const Register = () => {
                             <input
                               className="shadow bg-[#C9C9C9] text-sm bg-opacity-15 rounded w-full py-3 px-3 text-[#04080F]"
                               type={showPassword ? "text" : "password"}
-                              {...register("confirmPass", { required: "Please confirm your password", validate: value => value === password || "Passwords do not match" })}
-                              name="confirmPass"
+                              {...register("confirmPassword", { required: "Please confirm your password", validate: value => value === password || "Passwords do not match" })}
+                              name="confirmPassword"
                               placeholder="Confirm Password"
                             />                           
                           </div>
-                          {errors.confirmPass && (
-                              <p className="text-red-500 text-sm mt-1">{errors.confirmPass.message}</p>
+                          {errors.confirmPassword && (
+                              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
                             )}
                       </div>
                       <div className="pt-6">

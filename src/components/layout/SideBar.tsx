@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { logout } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/hook";
 import { FaBullhorn, FaCalendarCheck, FaMapMarkerAlt, FaUserClock } from "react-icons/fa";
 import { FaArrowRightFromBracket } from "react-icons/fa6";
 import { IoSave } from "react-icons/io5";
@@ -6,6 +8,13 @@ import { NavLink } from "react-router-dom";
 
 
 const SideBar = () => {
+  const dispatch = useAppDispatch()
+
+  //handle logout
+  const handleLogout = () =>{
+    dispatch(logout())
+  }
+
     return (
         <aside className=" bg-[#F0F4FA] text-[#54246D] col-span-2 h-full sticky py-5 border-r">
           <nav className="flex flex-col gap-2 px-4 lg:px-5 py-1">
@@ -95,7 +104,7 @@ const SideBar = () => {
                   <span className="truncate text-xs font-normal">Geo-Fencing</span>
                 </NavLink>
 
-                <NavLink
+                <NavLink onClick={handleLogout}
                   to="/"
                   className={({ isActive }) =>
                     cn(

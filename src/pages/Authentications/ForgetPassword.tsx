@@ -3,7 +3,7 @@ import Lottie from "lottie-react";
 import forgetPassAnimation from "../../assets/auth/forgetPassword.json"
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { setUser } from "@/redux/features/auth/authSlice";
+import { setAdmin } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hook";
 import { useResetPassMutation } from "@/redux/features/auth/authApi";
 import { toast } from "sonner";
@@ -52,7 +52,7 @@ const ForgetPassword = () => {
       console.log(formInfo);
 
       const responseData = await resetPass(formInfo).unwrap();
-      dispatch(setUser({ user: responseData }));
+      dispatch(setAdmin({ admin: responseData }));
       toast.success("Reset Data Done.", { id: toastId, duration: 2000 });
       navigate("/");
     } catch (error) {

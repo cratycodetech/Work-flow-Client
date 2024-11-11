@@ -21,12 +21,25 @@ import { useState } from "react";
 import {  FaCloudDownloadAlt, FaFilter } from "react-icons/fa";
 
 const UpperPart = () => {
+    const [department, setDepartment] = useState<string | null>(null);
+    const [employeeID, setEmployeeID] = useState<string | null>(null);
     const [date, setDate] = useState<Date>()
+
+    const handleFilterClick = () => {
+        // Handle filter data here
+        console.log("Filters applied:");
+        console.log("Department:", department);
+        console.log("Employee ID:", employeeID);
+        console.log("Date:", date ? format(date, "PPP") : "No date selected");
+        
+        // add code here to fetch or filter data based on the selected filters
+        
+    };
 
     return (
         <div className="flex flex-col lg:flex-row justify-between items-center gap-5">
             <div>
-                <Select>
+                <Select onValueChange={(value) => setDepartment(value)}>
                   <SelectTrigger className="w-[128px] h-[45px] bg-[#459895] text-[#F8F8F8] font-normal text-sm">
                     <SelectValue placeholder="Select a Department" />
                   </SelectTrigger>
@@ -44,7 +57,7 @@ const UpperPart = () => {
             </div>
             <div className="flex flex-col lg:flex-row justify-center items-center gap-5">
             <div>
-                <Select>
+                <Select onValueChange={(value) => setEmployeeID(value)}>
                   <SelectTrigger className="lg:w-[155px]  flex items-center gap-2 p-[10px] border border-gray-300 rounded-md">
                         <FaClipboardUser className="w-[14px] h-[180px] text-[#F3F4F8]" />
                         <SelectValue placeholder="Select an Employee ID" />
@@ -84,8 +97,7 @@ const UpperPart = () => {
                 </Popover>
             </div>
             <div>
-                <Button
-                //   variant={"outline"}
+                <Button onClick={handleFilterClick}
                   className="w-[98px]  p-[10px] gap-2 text-center font-normal bg-[#3D5A8F] text-[#F8F8F8]"
                 >
                   <FaFilter className="w-[18px] h-[18px] rounded-md"></FaFilter>

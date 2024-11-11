@@ -7,7 +7,7 @@ import { Eye } from "lucide-react";
 import { FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 import { toast } from "sonner";
-import { setUser } from "@/redux/features/auth/authSlice";
+import { setAdmin } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hook";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 
@@ -38,8 +38,12 @@ const Login = () => {
       };
       
       const res = await login(loginInfo).unwrap()
-      const token = res.token;
-      dispatch(setUser({user: loginInfo, token: token}))
+      // console.log("Login Response:", res);  
+
+      const token = res.data.token;
+      console.log("token:",token);
+
+      dispatch(setAdmin({admin: loginInfo, token: token}))
       toast.success("Login Done.", { id: toastId, duration: 2000 });
       navigate("/");
     } catch (error) {

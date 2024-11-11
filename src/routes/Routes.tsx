@@ -12,10 +12,8 @@ import Announcement from "@/pages/Announcement/Announcement";
 import GeoFencing from "@/pages/GeoFencing/GeoFencing";
 import MainPage from "@/pages/Authentications/MainPage";
 import Register from "@/pages/Authentications/Register";
-import ConfirmRegistration from "@/pages/Authentications/ConfirmRegistration";
 import Login from "@/pages/Authentications/Login";
 import ForgetPassword from "@/pages/Authentications/ForgetPassword";
-import ResetPassword from "@/pages/Authentications/ResetPassword";
 
 const router = createBrowserRouter([
   {

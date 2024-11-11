@@ -2,7 +2,7 @@ import { RootState } from "../../store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Define the types for user and token
-export type TUser = {
+export type TAdmin = {
   adminId?: string;
   email?: string;
   password?: string;
@@ -11,7 +11,7 @@ export type TUser = {
   status?: boolean;
 }
 
-export type TUserToken = {
+export type TAdminToken = {
   id: string;
   email: string;
   role: string;
@@ -19,13 +19,13 @@ export type TUserToken = {
 
 // Define the initial state type
 type AuthState = {
-  user: TUser | null;
-  token: TUserToken | null;
+  admin: TAdmin | null;
+  token: TAdminToken | null;
 }
 
 // Define the initial state
 const initialState: AuthState = {
-  user: null,
+  admin: null,
   token: null
 };
 
@@ -33,22 +33,22 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<{ user?: TUser; token?: TUserToken }>) => {
-      const { user, token } = action.payload;
-      if(user) state.user = user;
+    setAdmin: (state, action: PayloadAction<{ admin?: TAdmin; token?: TAdminToken }>) => {
+      const { admin, token } = action.payload;
+      if(admin) state.admin = admin;
       if(token) state.token = token;
     },
     logout: (state) => {
-      state.user = null;
+      state.admin = null;
       state.token = null;
     }
   },
 });
 
-export const { setUser, logout } = authSlice.actions;
+export const { setAdmin, logout } = authSlice.actions;
 
 export default authSlice.reducer;
 
 // Other code such as selectors can use the imported `RootState` type
-export const useCurrentUser = (state: RootState): TUser | null => state.auth.user;
-export const useCurrentUserToken = (state: RootState): TUserToken | null => state.auth.token;
+export const useCurrentAdmin = (state: RootState): TAdmin | null => state.auth.admin;
+export const useCurrentAdminToken = (state: RootState): TAdminToken | null => state.auth.token;

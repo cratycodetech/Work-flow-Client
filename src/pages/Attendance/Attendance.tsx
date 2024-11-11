@@ -13,6 +13,7 @@ import {
   } from "@/components/ui/table"
 import AttendanceDetailsModal from "@/components/modals/AttendanceDetailsModal";
 import UpperPart from "@/components/functionalities/UpperPart";
+import { useGetAllEmployeeAttendanceQuery } from "@/redux/features/attendance/attendanceApi";
    
   const invoices = [
     {
@@ -37,6 +38,10 @@ import UpperPart from "@/components/functionalities/UpperPart";
   
 const Attendance = () => {
     // const [date, setDate] = useState<Date>()
+    const { data: getAllEmployeeAttendance } = useGetAllEmployeeAttendanceQuery(undefined);
+
+  // Log the data if available
+  console.log(getAllEmployeeAttendance);
 
     return (
         <div>
@@ -95,8 +100,6 @@ const Attendance = () => {
                   </TableBody>
                   <TableFooter>
                     <TableRow>
-                      {/* <TableCell colSpan={3}>Total</TableCell>
-                      <TableCell className="text-right">$2,500.00</TableCell> */}
                     </TableRow>
                   </TableFooter>
                 </Table>
