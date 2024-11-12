@@ -43,4 +43,4 @@ const announcementApi = baseApi.injectEndpoints({
     })
 })
 
-export const {useAddEmployeeMutation, useGetAllEmployeeQuery, useGetSingleEmployeeQuery, useUpdateEmployeeMutation, useDeleteEmployeeMutation } = announcementApi;
+export const {useAddAnnouncementMutation, useGetAllEmployeeQuery, useGetSingleEmployeeQuery, useUpdateEmployeeMutation, useDeleteEmployeeMutation } = announcementApi;

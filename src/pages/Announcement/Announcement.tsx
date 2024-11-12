@@ -2,10 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useAddAnnouncementMutation } from "@/redux/features/announcement/announcementApi";
+import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
 import { SelectContent } from "@radix-ui/react-select";
-import { useForm } from "react-hook-form";
+import { doesNotMatch } from "assert";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { FaBullhorn, FaPaperPlane } from "react-icons/fa";
 import { FaClipboardUser, FaTrashCan } from "react-icons/fa6";
+import { useQueryClient } from "react-query";
+import { toast } from "sonner";
 
 //for table
 const invoices = [
@@ -29,53 +34,102 @@ const invoices = [
     },
   ]
 
+type TFormData = {
+  departmentName: string,
+  description: string
+}
+
 const Announcement = () => {
-    const { register } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const {data: getAllEmployee} = useGetAllEmployeeQuery(undefined)
+  const [addAnnouncement] = useAddAnnouncementMutation()
+  const queryClient = useQueryClient();
+
+
+  //handle form
+  const onSubmit : SubmitHandler<TFormData> = async (data) => {
+    const toastId = toast.loading("announcement in");
+    try {
+      const formInfo = {
+        departmentName: data.departmentName,
+        description: data.description,
+      };
+
+      addAnnouncement(formInfo)
+      toast.success("Announcement Done.", { id: toastId, duration: 2000 });
+      queryClient.invalidateQueries("announcement");
+      
+    } catch (error) {
+      toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+    }
+  };
 
     return (
         <div>
             <div className="flex flex-col md:flex-row lg:flex-row gap-16 w-full">
                 <div className="w-full">
-                    <Card className=" bg-[#459895] text-[#F8F8F8]">
-                      <CardHeader>
-                        <CardTitle className="text-xl font-semibold leading-7">Announcement</CardTitle>   
-                        <CardDescription className="text-[#F8F8F8]">
-                            <div className="flex items-center justify-between gap-8">
-                                <div>
-                                    <p className="text-xs">Select Department</p>
-                                </div>
-                                <div>
-                                    <Select>
-                                      <SelectTrigger className="w-[128px] h-[45px] bg-[#F8F8F8] text-[#459895] font-normal text-sm">
-                                        <SelectValue placeholder="Department" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectGroup>
-                                          <SelectLabel>Department</SelectLabel>
-                                          <SelectItem value="apple">Apple</SelectItem>
-                                          <SelectItem value="banana">Banana</SelectItem>
-                                        </SelectGroup>
-                                      </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        </CardDescription>                   
-                        </CardHeader>
-                      <CardContent>
-                        <div className="border flex flex-col items-center justify-center rounded-lg py-10">
-                            <FaBullhorn className="w-[40px] h-[36px]"></FaBullhorn>
-                            <p className="text-sm mt-3">Write an announcement</p>
-                        </div>
+                    <Card className=" bg-[#459895] text-[#F8F8F8] p-8">
+        
+                        <div className="flex items-center gap-4">
+                        <FaBullhorn className="w-[35px] h-[30px] text-[#F8F8F8]"></FaBullhorn>
+                        <h1 className="text-xl font-semibold leading-7">Announcement</h1> 
+                        </div>                     
 
-                        
-                      </CardContent>
-                      <CardFooter className="">
-                            <Button className="bg-[#F8F8F8] text-[#459895] text-xs">
-                                <FaPaperPlane className="w-[18px] h-[18px]"></FaPaperPlane>
-                                Send
-                            </Button>
-                      </CardFooter>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                          <div className="flex items-center justify-between gap-8">
+                            <div>
+                              <p className="text-xs">Select Department</p>
+                            </div>
+                            <div>
+                              <Select
+                                {...register("departmentName", { required: "Please select a department" })}
+                                onValueChange={(value) => setValue("departmentName", value)} // Update the form value
+                              >
+                                <SelectTrigger className="w-[128px] h-[45px] bg-[#F8F8F8] text-[#459895] font-normal text-sm">
+                                  <SelectValue placeholder="Select Department" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Department</SelectLabel>
+                                    {/* Map over employee data to get unique department names */}
+                                    {getAllEmployee?.data
+                                      ?.map((item) => item.departmentName) // Extract departments from employee data
+                                      .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
+                                      .map((departmentName) => (
+                                        <SelectItem key={departmentName} value={departmentName}>
+                                          {departmentName}
+                                        </SelectItem>
+                                      ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                          
+                              {/* Show validation error message if any */}
+                              {errors.departmentName && (
+                                <p className="text-red-500 text-xs mt-1">{errors?.departmentName?.message}</p>
+                              )}
+                            </div>
+                          </div>
+          
+                          <div className="mt-5 flex items-center rounded-lg bg-[#F8F8F8] text-[#459895]">
+                              <textarea
+                                {...register("description", { required: "description is required" })} // Register the textarea
+                                className="w-full bg-[#459895] text-[#F8F8F8] h-[150px] p-3 border rounded-md focus:outline-none focus:ring focus:ring-[#459895] text-sm"
+                                placeholder="Write an announcement."
+                              ></textarea>
+                            </div>
+                            {errors.message && (
+                              <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+                            )}
+              
+                          <Button type="submit" className="bg-[#F8F8F8] text-[#459895] text-xs mt-3">
+                              <FaPaperPlane className="w-[18px] h-[18px]"></FaPaperPlane>
+                              Send
+                          </Button>
+                        </form>
                     </Card>
+
+
                 </div>
                 <div className="w-full">
                     <Card className=" bg-[#3D5A8F] text-[#F8F8F8]">
