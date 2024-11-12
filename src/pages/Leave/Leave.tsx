@@ -24,6 +24,8 @@ import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar";
 import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
 import { useGetAllLeaveQuery } from "@/redux/features/leave/leaveApi";
+import { useAppSelector } from "@/redux/hook";
+import { selectFilter } from "@/redux/features/filters/filterSlice";
 
 
   //for graph
@@ -59,14 +61,28 @@ const Leave = () => {
     const [date, setDate] = useState<Date>()
     const { data: GetAllEmployee } = useGetAllEmployeeQuery(undefined);
     const { data: GetAllLeave } = useGetAllLeaveQuery(undefined);
+    //for filter
+  const filters = useAppSelector(selectFilter);
 
-
+  //get others data for show all table column
     const getLeaveData = (employeeId: string) => {
       const leaveData = GetAllLeave?.data?.find(
         (leave: any) => leave.employeeId === employeeId
       );
       return { leaveData };
     };
+
+  // Apply filters to the employees
+ const filteredEmployees = GetAllEmployee?.data.filter((employee: any) => {
+  const isDepartmentMatch = filters.department ? employee.departmentName === filters.department : true;
+  const isEmployeeIDMatch = filters.employeeID ? employee.employeeId === filters.employeeID : true;
+
+  // Normalize both the joiningDate and the selected date to YYYY-MM-DD format for comparison
+  const employeeJoiningDate = employee.joiningDate ? employee.joiningDate.split('T')[0] : null;
+  const isDateMatch = filters.date ? employeeJoiningDate === filters.date : true;
+
+  return isDepartmentMatch && isEmployeeIDMatch && isDateMatch;
+});
 
 
     return (
@@ -197,7 +213,7 @@ const Leave = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                      {GetAllEmployee?.data?.map((employee: any) => {
+                      {filteredEmployees?.map((employee: any) => {
                       const { leaveData } = getLeaveData(employee._id);
                       return (
                       <TableRow key={employee.employeeId}>

@@ -11,7 +11,9 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
+import { selectFilter } from "@/redux/features/filters/filterSlice";
 import { useGetAllSalaryQuery } from "@/redux/features/salary/salaryApi";
+import { useAppSelector } from "@/redux/hook";
 import { FaEllipsis } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
@@ -39,13 +41,29 @@ const invoices = [
 const Salary = () => {
   const { data: GetAllEmployee } = useGetAllEmployeeQuery(undefined);
   const { data: GetAllSalary } = useGetAllSalaryQuery(undefined);
+  //for filter
+  const filters = useAppSelector(selectFilter);
 
+  //get others data for show all table column
   const getEmployeeData = (employeeId: string) => {
     const salaryData = GetAllSalary?.data?.find(
       (salary: any) => salary.employeeId === employeeId
     );
     return { salaryData };
   };
+
+   // Apply filters to the employees
+ const filteredEmployees = GetAllEmployee?.data.filter((employee: any) => {
+  const isDepartmentMatch = filters.department ? employee.departmentName === filters.department : true;
+  const isEmployeeIDMatch = filters.employeeID ? employee.employeeId === filters.employeeID : true;
+
+  // Normalize both the joiningDate and the selected date to YYYY-MM-DD format for comparison
+  const employeeJoiningDate = employee.joiningDate ? employee.joiningDate.split('T')[0] : null;
+  const isDateMatch = filters.date ? employeeJoiningDate === filters.date : true;
+
+  return isDepartmentMatch && isEmployeeIDMatch && isDateMatch;
+});
+
     return (
         <div>
             <UpperPart/>
@@ -66,7 +84,7 @@ const Salary = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {GetAllEmployee?.data?.map((employee: any) => {
+                    {filteredEmployees?.map((employee: any) => {
                     const { salaryData } = getEmployeeData(employee._id);
                     return (
                       <TableRow key={employee.employeeId} className="bg-[#FFFFFF01]">

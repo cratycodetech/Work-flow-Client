@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-  } from "@/components/ui/select"
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { FaCalendarDays, FaClipboardUser } from "react-icons/fa6";
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
@@ -18,104 +19,139 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { useState } from "react";
-import {  FaCloudDownloadAlt, FaFilter } from "react-icons/fa";
+import { FaCloudDownloadAlt, FaFilter } from "react-icons/fa";
+import { useAppDispatch } from "@/redux/hook";
+import { setFilters } from "@/redux/features/filters/filterSlice";
+import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
 
 const UpperPart = () => {
-    const [department, setDepartment] = useState<string | null>(null);
-    const [employeeID, setEmployeeID] = useState<string | null>(null);
-    const [date, setDate] = useState<Date>()
+  const [department, setDepartment] = useState<string>(""); 
+  const [employeeID, setEmployeeID] = useState<string>("");
+  const [date, setDate] = useState<Date | null>(null);
+  const dispatch = useAppDispatch();
+  const { data: getAllEmployee } = useGetAllEmployeeQuery(undefined);
 
-    const handleFilterClick = () => {
-        // Handle filter data here
-        console.log("Filters applied:");
-        console.log("Department:", department);
-        console.log("Employee ID:", employeeID);
-        console.log("Date:", date ? format(date, "PPP") : "No date selected");
-        
-        // add code here to fetch or filter data based on the selected filters
-        
-    };
+  //handle filter
+  const handleFilterClick = () => {
+    const dateString = date ? new Date(date).toLocaleDateString('en-CA') : null; // 'en-CA' is the YYYY-MM-DD format
+    const filters = { department, employeeID, date: dateString };
 
-    return (
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-5">
-            <div>
-                <Select onValueChange={(value) => setDepartment(value)}>
-                  <SelectTrigger className="w-[128px] h-[45px] bg-[#459895] text-[#F8F8F8] font-normal text-sm">
-                    <SelectValue placeholder="Select a Department" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Department</SelectLabel>
-                      <SelectItem value="apple">Apple</SelectItem>
-                      <SelectItem value="banana">Banana</SelectItem>
-                      <SelectItem value="blueberry">Blueberry</SelectItem>
-                      <SelectItem value="grapes">Grapes</SelectItem>
-                      <SelectItem value="pineapple">Pineapple</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-            </div>
-            <div className="flex flex-col lg:flex-row justify-center items-center gap-5">
-            <div>
-                <Select onValueChange={(value) => setEmployeeID(value)}>
-                  <SelectTrigger className="lg:w-[155px]  flex items-center gap-2 p-[10px] border border-gray-300 rounded-md">
-                        <FaClipboardUser className="w-[14px] h-[180px] text-[#F3F4F8]" />
-                        <SelectValue placeholder="Select an Employee ID" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Employee ID</SelectLabel>
-                      <SelectItem value="blueberry">Blueberry</SelectItem>
-                      <SelectItem value="grapes">Grapes</SelectItem>
-                      <SelectItem value="pineapple">Pineapple</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-            </div>
-            <div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                    //   variant={"outline"}
-                      className={cn(
-                        "w-[185px]  p-[10px] gap-2 justify-start text-left font-normal bg-[#3D5A8F] text-[#F8F8F8]",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <FaCalendarDays className="text-[#F8F8F8] rounded-md"></FaCalendarDays>
-                      {date ? format(date, "PPP") : <span className="text-[#F8F8F8]">Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-            </div>
-            <div>
-                <Button onClick={handleFilterClick}
-                  className="w-[98px]  p-[10px] gap-2 text-center font-normal bg-[#3D5A8F] text-[#F8F8F8]"
-                >
-                  <FaFilter className="w-[18px] h-[18px] rounded-md"></FaFilter>
-                   <span className="font-normal text-sm leading-4">Filters</span>
-                </Button>
-            </div>
-            <div>
-                <Button
-                //   variant={"outline"}
-                  className="w-[98px]  p-[10px] gap-2 text-center font-normal bg-[#459895] text-[#F8F8F8]"
-                >
-                  <FaCloudDownloadAlt className='w-[18px] h-[18px] rounded-md'></FaCloudDownloadAlt>
-                   <span className="font-normal text-sm leading-4">Export</span>
-                </Button>
-            </div>
-            </div>
+    dispatch(setFilters(filters));
+};
+
+  return (
+    <div className="flex flex-col lg:flex-row justify-between items-center gap-5">
+      <div>
+        <Select
+          value={department} // Set the value directly from state
+          onValueChange={(value) => setDepartment(value)} // Update state when a value is selected
+        >
+          <SelectTrigger className="w-[128px] h-[45px] bg-[#459895] text-[#F8F8F8] font-normal text-sm">
+            <SelectValue placeholder="Select Department" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Department</SelectLabel>
+              {getAllEmployee?.data ? (
+                getAllEmployee?.data
+                  .map((item: any) => item?.departmentName)
+                  .filter(
+                    (value: string, index: number, self: string[]) =>
+                      self.indexOf(value) === index // Remove duplicates
+                  )
+                  .map((departmentName: string) => (
+                    <SelectItem key={departmentName} value={departmentName}>
+                      {departmentName}
+                    </SelectItem>
+                  ))
+              ) : (
+                <SelectItem value="disabled" disabled>
+                  No departments available
+                </SelectItem>
+              )}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-5">
+        <div>
+          <Select
+            value={employeeID}
+            onValueChange={(value) => setEmployeeID(value)}
+          >
+            <SelectTrigger className="lg:w-[180px] flex items-center gap-2 p-[10px] border border-gray-300 rounded-md">
+              <FaClipboardUser className="w-[14px] h-[180px] text-[#F3F4F8]" />
+              <SelectValue placeholder="Select an Employee ID" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Employee ID</SelectLabel>
+                {getAllEmployee?.data ? (
+                  getAllEmployee?.data
+                    .map((item: any) => item?.employeeId)
+                    .filter(
+                      (value: string, index: number, self: string[]) =>
+                        self.indexOf(value) === index // Remove duplicates
+                    )
+                    .map((employeeId: string) => (
+                      <SelectItem key={employeeId} value={employeeId}>
+                        {employeeId}
+                      </SelectItem>
+                    ))
+                ) : (
+                  <SelectItem value="disabled" disabled>
+                    No employees available
+                  </SelectItem>
+                )}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
-    );
+
+        <div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                className={cn(
+                  "w-[185px] p-[10px] gap-2 justify-start text-left font-normal bg-[#3D5A8F] text-[#F8F8F8]",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <FaCalendarDays className="text-[#F8F8F8] rounded-md" />
+                {date ? format(date, "PPP") : <span className="text-[#F8F8F8]">Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div>
+          <Button
+            onClick={handleFilterClick}
+            className="w-[98px] p-[10px] gap-2 text-center font-normal bg-[#3D5A8F] text-[#F8F8F8]"
+          >
+            <FaFilter className="w-[18px] h-[18px] rounded-md" />
+            <span className="font-normal text-sm leading-4">Filters</span>
+          </Button>
+        </div>
+
+        <div>
+          <Button className="w-[98px] p-[10px] gap-2 text-center font-normal bg-[#459895] text-[#F8F8F8]">
+            <FaCloudDownloadAlt className="w-[18px] h-[18px] rounded-md" />
+            <span className="font-normal text-sm leading-4">Export</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default UpperPart;

@@ -1,43 +1,40 @@
+import { RootState } from "@/redux/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface FilterState {
     department: string | null;
     employeeID: string | null;
-    singleDate: string | null; // For single date selection
-    dateRange: { startDate: string | null; endDate: string | null }; // For date range selection
+    date: string | null; // For single date selection
 }
 
 const initialState: FilterState = {
-    department: null,
-    employeeID: null,
-    singleDate: null,
-    dateRange: { startDate: null, endDate: null },
+    department: "",
+    employeeID: "",
+    date: null,
 };
 
 const filterSlice = createSlice({
-    name: "filters",
+    name: "filter",
     initialState,
     reducers: {
-        setDepartment: (state, action: PayloadAction<string | null>) => {
-            state.department = action.payload;
-        },
-        setEmployeeID: (state, action: PayloadAction<string | null>) => {
-            state.employeeID = action.payload;
-        },
-        setSingleDate: (state, action: PayloadAction<string | null>) => {
-            state.singleDate = action.payload;
-        },
-        setDateRange: (state, action: PayloadAction<{ startDate: string | null; endDate: string | null }>) => {
-            state.dateRange = action.payload;
+        setFilters: (state, action: PayloadAction<FilterState>) => {
+            const { department, employeeID, date } = action.payload;
+            state.department = department;
+            state.employeeID = employeeID;
+            state.date = date; // Store date as string
         },
         resetFilters: (state) => {
             state.department = null;
             state.employeeID = null;
-            state.singleDate = null;
-            state.dateRange = { startDate: null, endDate: null };
+            state.date = null;
         },
     },
 });
 
-export const { setDepartment, setEmployeeID, setSingleDate, setDateRange, resetFilters } = filterSlice.actions;
+export const { setFilters, resetFilters } = filterSlice.actions;
 export default filterSlice.reducer;
+
+  // Get state from Redux store
+  export const selectFilter = (state: RootState) => state.filter;
+
+
