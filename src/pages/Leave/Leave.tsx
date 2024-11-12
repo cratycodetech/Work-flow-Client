@@ -22,6 +22,8 @@ import { FaCalendarDays } from "react-icons/fa6";
 import { useState } from "react";
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar";
+import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
+import { useGetAllLeaveQuery } from "@/redux/features/leave/leaveApi";
 
 
   //for graph
@@ -55,6 +57,16 @@ const invoices = [
 
 const Leave = () => {
     const [date, setDate] = useState<Date>()
+    const { data: GetAllEmployee } = useGetAllEmployeeQuery(undefined);
+    const { data: GetAllLeave } = useGetAllLeaveQuery(undefined);
+
+
+    const getLeaveData = (employeeId: string) => {
+      const leaveData = GetAllLeave?.data?.find(
+        (leave: any) => leave.employeeId === employeeId
+      );
+      return { leaveData };
+    };
 
 
     return (
@@ -185,32 +197,34 @@ const Leave = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {invoices.map((invoice) => (
-                      <TableRow key={invoice.invoice}>
-                        <TableCell className="font-medium bg-[#F3F4F8] text-[#7C7C7C] text-xs rounded-md ">{invoice.invoice}</TableCell>
+                      {GetAllEmployee?.data?.map((employee: any) => {
+                      const { leaveData } = getLeaveData(employee._id);
+                      return (
+                      <TableRow key={employee.employeeId}>
+                        <TableCell className="font-medium bg-[#F3F4F8] text-[#7C7C7C] text-xs rounded-md ">{employee?.employeeId}</TableCell>
                         <TableCell className="bg-[#F3F4F8] text-[#7C7C7C] text-xs rounded-md">
                             <div className="flex items-center justify-start gap-2 ">
                                 <img className="w-[18px] h-[18px] rounded-full" src="https://i.ibb.co.com/fCx3Y8R/Ellipse-1.webp" alt="" />
-                                <p className="leading-[18px] text-xs">Rimon Ron</p>
+                                <p className="leading-[18px] text-xs">{employee?.employeeName}</p>
                             </div>
                         </TableCell>
                         <TableCell className="bg-[#F3F4F8] text-[#7C7C7C] rounded-md ">
                             <div className="flex items-center justify-start gap-2">
                             <FaBuilding className="w-[18px] h-[18px]"></FaBuilding>
-                            <p className="leading-[18px] text-xs">Developer</p>
+                            <p className="leading-[18px] text-xs">{employee?.departmentName}</p>
                             </div>
                         </TableCell>
-                        <TableCell className="bg-[#F3F4F8] text-[#7C7C7C] text-xs rounded-md leading-[18px] ">Present</TableCell>
+                        <TableCell className="bg-[#F3F4F8] text-[#7C7C7C] text-xs rounded-md leading-[18px] ">{leaveData?.status || "N/A"}</TableCell>
                         <TableCell className="bg-[#F3F4F8] text-[#7C7C7C] text-xs rounded-md ">
                             <div className="flex items-center justify-start gap-2">
                                 <p className="w-[12px] h-[12px] border bg-[#3D5A8F]"></p>
-                                <p className="leading-[18px] text-xs">Approved</p>
+                                <p className="leading-[18px] text-xs">{leaveData?.leaveStatus || "N/A"}</p>
                             </div>
                         </TableCell>
                         <TableCell className="bg-[#F3F4F8] text-[#7C7C7C] text-xs rounded-md">
                             <div className="flex items-center justify-start gap-2 ">
                                 <p className="w-[12px] h-[12px] border bg-[#3D5A8F]"></p>
-                                <p className="leading-[18px] text-xs">Paid Leave</p>
+                                <p className="leading-[18px] text-xs">{leaveData?.leaveType || "N/A"}</p>
                             </div>
                         </TableCell>
                         <TableCell>
@@ -220,7 +234,8 @@ const Leave = () => {
                                <FaEllipsis className="h-[20px] w-[20px] text-[#7C7C7C] mx-auto"></FaEllipsis>
                         </TableCell>
                       </TableRow>
-                    ))}
+                       );
+                      })}
                   </TableBody>
                   <TableFooter>
                     <TableRow>

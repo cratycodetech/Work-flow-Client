@@ -2,7 +2,7 @@ import { baseApi } from "@/redux/api/baseApi"
 
 const adminDashboardApi = baseApi.injectEndpoints({
     endpoints: (builder) =>({
-        getAllEmployee: builder.query({
+        getTotalEmployee: builder.query({
             query: (employeeInfo) =>({
                 url: "/dashbroad/total",
                 method: "GET",
@@ -13,4 +13,4 @@ const adminDashboardApi = baseApi.injectEndpoints({
     })
 })
 
-export const {useGetAllEmployeeQuery, } = adminDashboardApi;
+export const {useGetTotalEmployeeQuery, } = adminDashboardApi;

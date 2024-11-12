@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import UpperPart from "@/components/functionalities/UpperPart";
 import {
     Table,
@@ -9,6 +10,8 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table"
+import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
+import { useGetAllSalaryQuery } from "@/redux/features/salary/salaryApi";
 import { FaEllipsis } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
@@ -34,6 +37,15 @@ const invoices = [
   ]
 
 const Salary = () => {
+  const { data: GetAllEmployee } = useGetAllEmployeeQuery(undefined);
+  const { data: GetAllSalary } = useGetAllSalaryQuery(undefined);
+
+  const getEmployeeData = (employeeId: string) => {
+    const salaryData = GetAllSalary?.data?.find(
+      (salary: any) => salary.employeeId === employeeId
+    );
+    return { salaryData };
+  };
     return (
         <div>
             <UpperPart/>
@@ -54,16 +66,18 @@ const Salary = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {invoices.map((invoice) => (
-                      <TableRow key={invoice.invoice} className="bg-[#FFFFFF01]">
-                        <TableCell className="font-medium text-[#7C7C7C] text-xs border border-gray-300">{invoice.invoice}</TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">Rimon Ron</TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">UI/UX</TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">01398746</TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">15000</TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">500</TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">620</TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">8120</TableCell>
+                    {GetAllEmployee?.data?.map((employee: any) => {
+                    const { salaryData } = getEmployeeData(employee._id);
+                    return (
+                      <TableRow key={employee.employeeId} className="bg-[#FFFFFF01]">
+                        <TableCell className="font-medium text-[#7C7C7C] text-xs border border-gray-300">{employee?.employeeId}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{employee?.employeeName}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{employee?.departmentName}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{employee?.employeeNumber}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{salaryData?.baseSalary || "N/A"}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{salaryData?.deductions || "N/A"}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{salaryData?.bonus || "N/A"}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{salaryData?.totalSalary || "N/A"}</TableCell>
                         <TableCell className="border border-gray-300">
                             {/* <Button className="  h-[16px] text-xs rounded-md"> */}
                                 {/* <FaFileLines></FaFileLines> */}
@@ -73,7 +87,8 @@ const Salary = () => {
                                </Link>
                         </TableCell>
                       </TableRow>
-                    ))}
+                     );
+                    })}
                   </TableBody>
                   <TableFooter>
                     <TableRow>
