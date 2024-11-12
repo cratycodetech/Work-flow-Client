@@ -10,37 +10,37 @@ const announcementApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['announcement'],
         }),
-        getAllEmployee: builder.query({
-            query: (employeeInfo) =>({
+        getAllAnnouncement: builder.query({
+            query: (announcementInfo) =>({
                 url: "/announcement/all",
                 method: "GET",
-                body: employeeInfo
+                body: announcementInfo
             }),
-            providesTags: ['employee'],
+            providesTags: ['announcement'],
         }),
-        GetSingleEmployee: builder.query({
-            query: (employeeId) =>({
-                url: `/announcement/single/${employeeId}`,
-                method: "GET",
-            }),
-            providesTags: ['employee'],
-        }),
-        updateEmployee: builder.mutation({
-            query: (options) =>({
-                url: `/announcement/update/${options.id}`,
-                method: "PUT",
-                body: options.data,
-            }),
-            invalidatesTags: ['employee'],
-        }),
-        deleteEmployee: builder.mutation({
+        // GetSingleEmployee: builder.query({
+        //     query: (employeeId) =>({
+        //         url: `/announcement/single/${employeeId}`,
+        //         method: "GET",
+        //     }),
+        //     providesTags: ['employee'],
+        // }),
+        // updateEmployee: builder.mutation({
+        //     query: (options) =>({
+        //         url: `/announcement/update/${options.id}`,
+        //         method: "PUT",
+        //         body: options.data,
+        //     }),
+        //     invalidatesTags: ['employee'],
+        // }),
+        deleteAnnouncement: builder.mutation({
             query: (id) =>({
                 url: `/announcement/delete/${id}`,
                 method: "DELETE",
             }),
-            invalidatesTags: ['employee'],
+            invalidatesTags: ['announcement'],
         }),
     })
 })
 
-export const {useAddAnnouncementMutation, useGetAllEmployeeQuery, useGetSingleEmployeeQuery, useUpdateEmployeeMutation, useDeleteEmployeeMutation } = announcementApi;
+export const {useAddAnnouncementMutation, useGetAllAnnouncementQuery, useDeleteAnnouncementMutation } = announcementApi;
