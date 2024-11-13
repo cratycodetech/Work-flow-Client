@@ -10,7 +10,14 @@ const salaryApi = baseApi.injectEndpoints({
             }),
             providesTags: ['salary'],
         }),
+        GetSingleSalary: builder.query({
+            query: (salaryId) =>({
+                url: `/salary/single/${salaryId}`,
+                method: "GET",
+            }),
+            providesTags: ['salary'],
+        }),
     })
 })
 
-export const { useGetAllSalaryQuery} = salaryApi;
+export const { useGetAllSalaryQuery, useGetSingleSalaryQuery} = salaryApi;

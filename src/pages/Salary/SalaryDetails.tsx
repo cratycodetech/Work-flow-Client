@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -17,7 +18,11 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { FaEllipsis } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useGetSingleSalaryQuery } from "@/redux/features/salary/salaryApi";
+import { useGetSingleEmployeeQuery } from "@/redux/features/employee/employeeApi";
+import { useGetAllLeaveQuery, useGetSingleLeaveQuery } from "@/redux/features/leave/leaveApi";
+import moment from "moment";
 
 const invoices = [
     {
@@ -39,9 +44,32 @@ const invoices = [
       paymentMethod: "Bank Transfer",
     },
   ]
+// Define interfaces for your data
+type TEmployeeData = {
+  employeeId: string;
+  employeeName: string;
+  departmentName: string;
+}
+
+type TLeaveData = {
+  status: string;
+  leaveType: string;
+}
 
 
 const SalaryDetails = () => {
+  const { id } = useParams();
+  const {data: getSingleEmployee} = useGetSingleEmployeeQuery(id)
+  
+  const {data: getAllLeave} = useGetAllLeaveQuery(undefined)
+  const employeeID = getSingleEmployee?.data?._id;
+  const employeeLeaves = getAllLeave?.data?.find((leave: any) => leave.employeeId === employeeID);
+
+   // Use conditional chaining to prevent errors
+   const employeeId = getSingleEmployee?.data?.employeeId ?? "N/A";
+   const employeeName = getSingleEmployee?.data?.employeeName ?? "N/A";
+   const departmentName = getSingleEmployee?.data?.departmentName ?? "N/A";
+
     return (
         <div>
             <div>
@@ -64,26 +92,23 @@ const SalaryDetails = () => {
                 <div className="flex flex-col md:flex-row lg:flex-row gap-8">
                 <div className="pt-2">
                     <p className="text-[#7C7C7C] text-xs py-3 px-2">Employee ID</p>
-                    <p className="bg-[#F8F8F8] text-[#04080F] text-xs py-3 px-2 lg:w-[166px]">C1024</p>
+                    <p className="bg-[#F8F8F8] text-[#04080F] text-xs py-3 px-2 lg:w-[166px]">{employeeId}</p>
                 </div>
                 <div className="pt-2">
                     <p className="text-[#7C7C7C] text-xs py-3 px-2">Employee Name</p>
                     <div className="flex items-center justify-start gap-2 bg-[#F8F8F8] py-3 px-2 lg:w-[166px]">
                         <img className="w-[18px] h-[18px] rounded-full" src="https://i.ibb.co.com/fCx3Y8R/Ellipse-1.webp" alt="" />
-                        <p className="text-[#04080F] text-xs">Nitta  Ranjan Sarker</p>
+                        <p className="text-[#04080F] text-xs">{employeeName}</p>
                     </div>
                 </div>
                 <div className="pt-2">
                     <p className="text-[#7C7C7C] text-xs py-3 px-2">Department</p>
                     <div className="flex items-center justify-start gap-2 bg-[#F8F8F8] py-3 px-2 lg:w-[166px]">
                         <FaBuilding className="w-[18px] h-[18px]"></FaBuilding>
-                        <p className="text-[#04080F] text-xs">UI/UX</p>
+                        <p className="text-[#04080F] text-xs">{departmentName}</p>
                     </div>
                 </div>
                 </div>
-                
-
-
             </div>
 
             <div className="mt-8 bg-[#F8F8F8] rounded-lg pb-3">
@@ -98,22 +123,19 @@ const SalaryDetails = () => {
                       <TableHead className="bg-[#F3F4F8] text-[#04080F] text-xs font-normal border border-gray-300">Info</TableHead>
                       <TableHead className="bg-[#F3F4F8] text-[#04080F] text-xs font-normal border border-gray-300">Info</TableHead>
                       <TableHead className="bg-[#F3F4F8] text-[#04080F] text-xs font-normal border border-gray-300">Info</TableHead>
-                      <TableHead className="bg-[#F3F4F8] text-[#04080F] text-xs font-normal border border-gray-300 text-center">Info</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {invoices.map((invoice) => (
-                      <TableRow key={invoice.invoice} className="bg-[#FFFFFF01]">
-                        <TableCell className="font-medium text-[#7C7C7C] text-xs border border-gray-300">{invoice.invoice}</TableCell>
+                   
+                      <TableRow className="bg-[#FFFFFF01]">
+                        <TableCell className="font-medium text-[#7C7C7C] text-xs border border-gray-300">{moment(new Date(`${employeeLeaves?.createdAt}`)).format('DD MMMM YYYY') || "N/A"}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{employeeLeaves?.leaveStatus || "N/A"}</TableCell>
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300">{employeeLeaves?.leaveType || "N/A"}</TableCell>
                         <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>
                         <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>
                         <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>
-                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>
-                      </TableRow>
-                    ))}
+                        <TableCell className=" text-[#7C7C7C] text-xs border border-gray-300"></TableCell>                      </TableRow>
+
                   </TableBody>
                   <TableFooter>
                     <TableRow>

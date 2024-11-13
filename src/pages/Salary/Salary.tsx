@@ -100,7 +100,7 @@ const Salary = () => {
                             {/* <Button className="  h-[16px] text-xs rounded-md"> */}
                                 {/* <FaFileLines></FaFileLines> */}
                                {/* </Button> */}
-                               <Link to="/salaryDetails/1">
+                               <Link to={`/salaryDetails/${employee?._id}`}>
                                     <FaEllipsis className="h-[20px] w-[20px] text-[#463684] mx-auto "></FaEllipsis>
                                </Link>
                         </TableCell>
