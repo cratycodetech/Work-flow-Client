@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { useGetAllEmployeeQuery, useGetTotalEmployeeQuery } from "@/redux/features/adminDashboard/adminDashboardApi";
 import { useGetLatestAnnouncementQuery } from "@/redux/features/announcement/announcementApi";
-import { useGetTodayTotalLateEmployeeQuery, useGetTodayTotalPresentEmployeeQuery } from "@/redux/features/attendance/attendanceApi";
+import { useGetTodayTotalAbsentEmployeeQuery, useGetTodayTotalLateEmployeeQuery, useGetTodayTotalPresentEmployeeQuery } from "@/redux/features/attendance/attendanceApi";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { FaBullhorn, FaCalendarCheck, FaClock, FaUserClock } from "react-icons/fa"
@@ -47,10 +47,13 @@ const geoFencingCOLORS = ['#3D5A8F', '#E0D59A'];
 
 const Dashboard = () => {
   const {data: GetTotalEmployee} = useGetTotalEmployeeQuery(undefined)
-  const {data: getTodayLateArrivalEmployees} = useGetTodayTotalLateEmployeeQuery(undefined)
-  const {data: getTodayPresentEmployees} = useGetTodayTotalPresentEmployeeQuery(undefined)
-    // console.log(getTodayPresentEmployees);
   const {data: getLatestAnnouncement} = useGetLatestAnnouncementQuery(undefined)
+  const {data: getTodayTotalPresentEmployees} = useGetTodayTotalPresentEmployeeQuery(undefined)
+  const {data: getTodayTotalLateEmployees} = useGetTodayTotalLateEmployeeQuery(undefined)
+  const {data: getTodayTotalAbsentEmployees} = useGetTodayTotalAbsentEmployeeQuery(undefined)
+  console.log("one",getTodayTotalPresentEmployees);
+  console.log("two",getTodayTotalLateEmployees);
+  console.log("three",getTodayTotalAbsentEmployees);
 
     return (
         <div>
@@ -69,7 +72,7 @@ const Dashboard = () => {
                             <h1 className="font-normal text-sm text-[#F8F8F8] mt-5">Attendance</h1>
                         </div>
                         <div className=" bg-[#F8F8F8] w-[90px] h-[86px] rounded-lg flex items-center justify-center">
-                            <h1 className="text-[#E0D59A] font-bold text-2xl">124</h1>
+                            <h1 className="text-[#E0D59A] font-bold text-2xl">{getTodayTotalPresentEmployees?.count}</h1>
                         </div>
                     </Card>
                 </div>
@@ -80,7 +83,7 @@ const Dashboard = () => {
                             <h1 className="font-normal text-sm text-[#F8F8F8] mt-5">Leave Count</h1>
                         </div>
                         <div className=" bg-[#F8F8F8] w-[90px] h-[86px] rounded-lg flex items-center justify-center">
-                            <h1 className="text-[#459895] font-bold text-2xl">16</h1>
+                            <h1 className="text-[#459895] font-bold text-2xl">{getTodayTotalAbsentEmployees?.count}</h1>
                         </div>
                     </Card>
                 </div>
@@ -91,7 +94,7 @@ const Dashboard = () => {
                             <h1 className="font-normal text-sm text-[#F8F8F8] mt-5">Late Arrival</h1>
                         </div>
                         <div className=" bg-[#F8F8F8] w-[90px] h-[86px] rounded-lg flex items-center justify-center">
-                            <h1 className="text-[#54246D] font-bold text-2xl">{getTodayLateArrivalEmployees?.count}</h1>
+                            <h1 className="text-[#54246D] font-bold text-2xl">{getTodayTotalLateEmployees?.count}</h1>
                         </div>
                     </Card>
                 </div>
