@@ -8,10 +8,13 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useGetAllEmployeeQuery, useGetTotalEmployeeQuery } from "@/redux/features/adminDashboard/adminDashboardApi";
+import { useGetLatestAnnouncementQuery } from "@/redux/features/announcement/announcementApi";
 import { useGetTodayTotalLateEmployeeQuery, useGetTodayTotalPresentEmployeeQuery } from "@/redux/features/attendance/attendanceApi";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-import { FaCalendarCheck, FaClock, FaUserClock } from "react-icons/fa"
+import { FaBullhorn, FaCalendarCheck, FaClock, FaUserClock } from "react-icons/fa"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Legend, Cell, Label } from 'recharts';
+import moment from "moment";
 
 // Define the data for the pie chart
 const PieData = [
@@ -47,6 +50,7 @@ const Dashboard = () => {
   const {data: getTodayLateArrivalEmployees} = useGetTodayTotalLateEmployeeQuery(undefined)
   const {data: getTodayPresentEmployees} = useGetTodayTotalPresentEmployeeQuery(undefined)
     // console.log(getTodayPresentEmployees);
+  const {data: getLatestAnnouncement} = useGetLatestAnnouncementQuery(undefined)
 
     return (
         <div>
@@ -194,7 +198,6 @@ const Dashboard = () => {
                         </CardContent>
                     </Card>
                 </div>
-
             </div>
 
             <div className="lg:flex gap-8 mt-8">
@@ -246,9 +249,37 @@ const Dashboard = () => {
                           <p className="text-xs font-normal">Upcoming</p>
                           <CardTitle className="text-xl font-semibold">Announcement</CardTitle>
                             </CardHeader>
-                            <CardContent>
+                          <CardContent>
                         </CardContent>
                     </Card>
+                    <div className="mt-2 flex flex-col md:flex-row lg:flex-row gap-5 bg-[#F8F8F8]">
+                        <div className="md:w-2/12 lg::w-1/12 p-4 flex items-center justify-center">
+                            <FaBullhorn className="w-[40px] h-[38px] text-[#F8F8F8] border rounded-full bg-[#463684] p-2"></FaBullhorn>
+                        </div>
+                        <div className="md:w-10/12 lg:11/12">
+                            <Table className="">                          
+                                <TableHeader>
+                                <TableRow>
+                                  <TableHead className="bg-[#F3F4F8] text-[#54246D] text-xs">Date</TableHead>
+                                  <TableHead className="bg-[#F3F4F8] text-[#54246D] text-xs">Department Name</TableHead>
+                                  <TableHead className="bg-[#F3F4F8] text-[#54246D] text-xs">Announcement</TableHead>
+                                  <TableHead className="bg-[#F3F4F8] text-[#54246D] text-xs"></TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                  <TableRow key={getLatestAnnouncement?._id} className="bg-[#FFFFFF01]">
+                                    <TableCell className="font-medium text-[#04080F] text-xs">
+                                      {moment(new Date(`${getLatestAnnouncement?.createdAt}`)).format('DD MMMM YYYY')}
+                                    </TableCell>
+                                    <TableCell className=" text-[#7C7C7C] font-bold text-xs">{getLatestAnnouncement?.departmentName}</TableCell>
+                                    <TableCell className=" text-[#7C7C7C] text-xs text-justify">{getLatestAnnouncement?.description}</TableCell>
+                                  </TableRow>
+                              </TableBody>
+                            </Table>
+                        </div>
+                    </div>
+
+           
                 </div>
 
             </div>

@@ -18,6 +18,14 @@ const announcementApi = baseApi.injectEndpoints({
             }),
             providesTags: ['announcement'],
         }),
+        getLatestAnnouncement: builder.query({
+            query: (announcementInfo) =>({
+                url: "/announcement/latest",
+                method: "GET",
+                body: announcementInfo
+            }),
+            providesTags: ['announcement'],
+        }),
         // GetSingleEmployee: builder.query({
         //     query: (employeeId) =>({
         //         url: `/announcement/single/${employeeId}`,
@@ -43,4 +51,4 @@ const announcementApi = baseApi.injectEndpoints({
     })
 })
 
-export const {useAddAnnouncementMutation, useGetAllAnnouncementQuery, useDeleteAnnouncementMutation } = announcementApi;
+export const {useAddAnnouncementMutation, useGetAllAnnouncementQuery, useGetLatestAnnouncementQuery, useDeleteAnnouncementMutation } = announcementApi;
