@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import Lottie from "lottie-react";
 import forgetPassAnimation from "../../assets/auth/forgetPassword.json"
@@ -55,8 +56,12 @@ const ForgetPassword = () => {
       dispatch(setAdmin({ admin: responseData }));
       toast.success("Reset Data Done.", { id: toastId, duration: 2000 });
       navigate("/");
-    } catch (error) {
-      toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+    } catch (error: any) {
+      if (error?.data?.message) {
+        toast.error(error.data.message, { id: toastId, duration: 2000 });
+      } else {
+        toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+      }
     }
   };
 

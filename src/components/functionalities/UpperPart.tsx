@@ -24,7 +24,8 @@ import { useAppDispatch } from "@/redux/hook";
 import { setFilters } from "@/redux/features/filters/filterSlice";
 import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
 
-const UpperPart = () => {
+
+const UpperPart = ({ toPDF } : any) => {
   const [department, setDepartment] = useState<string>(""); 
   const [employeeID, setEmployeeID] = useState<string>("");
   const [date, setDate] = useState<Date | null>(null);
@@ -37,7 +38,7 @@ const UpperPart = () => {
     const filters = { department, employeeID, date: dateString };
 
     dispatch(setFilters(filters));
-};
+  };
 
   return (
     <div className="flex flex-col lg:flex-row justify-between items-center gap-5">
@@ -144,9 +145,9 @@ const UpperPart = () => {
         </div>
 
         <div>
-          <Button className="w-[98px] p-[10px] gap-2 text-center font-normal bg-[#459895] text-[#F8F8F8]">
+          <Button onClick={() => toPDF()} className="w-[98px] p-[10px] gap-2 text-center font-normal bg-[#459895] text-[#F8F8F8]">
             <FaCloudDownloadAlt className="w-[18px] h-[18px] rounded-md" />
-            <span className="font-normal text-sm leading-4">Export</span>
+            <span className="font-normal text-sm leading-4">Report</span>
           </Button>
         </div>
       </div>

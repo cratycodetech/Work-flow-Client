@@ -28,6 +28,7 @@ const Announcement = () => {
   const [addAnnouncement] = useAddAnnouncementMutation()
   const queryClient = useQueryClient();
   const {data: getAllAnnouncement} = useGetAllAnnouncementQuery(undefined)
+
   const [deleteAnnouncement] = useDeleteAnnouncementMutation()
 //second form
   const { register: registerSecond, handleSubmit: handleSubmitSecond, setValue: setValueSecond, formState: { errors: errorsSecond } } = useForm<TFormData>();
@@ -62,7 +63,7 @@ const Announcement = () => {
       };
 
       await addAnnouncement(formInfo);
-      toast.success("Employee announcement sent.", { id: toastId, duration: 2000 });
+      toast.success("Employee announcement sent Successfully..", { id: toastId, duration: 2000 });
       queryClient.invalidateQueries("announcement");
 
     } catch (error) {
@@ -157,20 +158,20 @@ const Announcement = () => {
                     </Card>
                 </div>
                 <div className="w-full">
-                    <Card className="bg-[#3D5A8F] text-[#F8F8F8] p-8">
+                    <Card className="bg-[#3D5A8F] text-[#F8F8F8] p-7">
                       <div className="flex items-center gap-3">
                         <FaBullhorn className="w-[35px] h-[30px] text-[#F8F8F8]" />
                         <h1 className="text-xl font-semibold leading-7">Employee Announcement</h1>
                       </div>
                     
                       <form onSubmit={handleSubmitSecond(onSubmitSecond)}>
-                        <div className="flex items-center justify-between gap-8">
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-4">
                           <div>
                             <p className="text-xs">Employee Details</p>
                           </div>
                     
-                          <div className="flex items-center gap-2">
-                            <div className="relative flex items-center rounded-lg bg-[#F8F8F8] text-[#459895]">
+                          <div className="flex flex-col md:flex-row lg:flex-row items-center gap-2">
+                            {/* <div className="relative flex items-center rounded-lg bg-[#F8F8F8] text-[#459895]">
                               <FaClipboardUser className="absolute right-2" />
                               <input
                                 className="shadow text-sm bg-opacity-15 rounded w-full py-3 px-3 text-[#459895]"
@@ -181,6 +182,38 @@ const Announcement = () => {
                               {errorsSecond.employeeId && (
                                 <p className="text-red-500 text-xs mt-1">{errorsSecond.employeeId.message}</p>
                               )}
+                            </div> */}
+
+                            <div>
+                              <Select
+                                {...registerSecond("employeeId", { required: "Please select a employeeId" })}
+                                onValueChange={(value) => setValueSecond("employeeId", value)}
+                              >
+                                <SelectTrigger className="h-[45px] bg-[#F8F8F8] text-[#459895] font-normal text-sm">
+                                  <SelectValue placeholder="Select employeeId" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Employee Id</SelectLabel>
+                                    {getAllEmployee?.data
+                                      ?.map((item: TFormData) => item.employeeId) // Extract employeeIds
+                                      .filter((value: any, index: any, self: any) => self.indexOf(value) === index) // Remove duplicates
+                                      .map((employeeId: string) => {
+                                        // Find the corresponding employee object with the employeeId
+                                        const employee = getAllEmployee?.data.find((item: TFormData) => item.employeeId === employeeId);
+                                        return (
+                                          <SelectItem key={employeeId} value={employee?._id}>
+                                            {employeeId}
+                                          </SelectItem>
+                                        );
+                                      })}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                              {/* Show validation error message if any */}
+                              {errorsSecond.employeeId && (
+                                <p className="text-red-500 text-xs mt-1">{errorsSecond?.employeeId?.message}</p>
+                              )}
                             </div>
                            
                             <div>
@@ -188,7 +221,7 @@ const Announcement = () => {
                                 {...registerSecond("departmentName", { required: "Please select a department" })}
                                 onValueChange={(value) => setValueSecond("departmentName", value)}
                               >
-                                <SelectTrigger className="w-[128px] h-[45px] bg-[#F8F8F8] text-[#459895] font-normal text-sm">
+                                <SelectTrigger className=" h-[45px] bg-[#F8F8F8] text-[#459895] font-normal text-sm">
                                   <SelectValue placeholder="Select Department" />
                                 </SelectTrigger>
                                 <SelectContent>

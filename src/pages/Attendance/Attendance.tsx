@@ -17,6 +17,7 @@ import { useGetAllSalaryQuery } from "@/redux/features/salary/salaryApi";
 import { useGetAllLeaveQuery } from "@/redux/features/leave/leaveApi";
 import { useAppSelector } from "@/redux/hook";
 import { selectFilter } from "@/redux/features/filters/filterSlice";
+import { usePDF } from "react-to-pdf";
 
 const Attendance = () => {
   const { data: GetAllEmployee } = useGetAllEmployeeQuery(undefined);
@@ -49,10 +50,14 @@ const Attendance = () => {
   return isDepartmentMatch && isEmployeeIDMatch && isDateMatch;
 });
 
+//for export data in pdf
+const { toPDF, targetRef } = usePDF({filename: 'report.pdf'});
+
+
   return (
     <div>
-      <UpperPart />
-      <div className="mt-8 bg-[#F8F8F8] rounded-lg pb-3 pt-1">
+      <UpperPart toPDF={toPDF}></UpperPart>
+      <div ref={targetRef} className="mt-8 bg-[#F8F8F8] rounded-lg pb-3 pt-1">
         <Table className="border-separate border-spacing-2">
           <TableCaption>A list of your Employee Attendance.</TableCaption>
           <TableHeader>

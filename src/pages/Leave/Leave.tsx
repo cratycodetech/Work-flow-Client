@@ -21,6 +21,7 @@ import { useAppSelector } from "@/redux/hook";
 import { selectFilter } from "@/redux/features/filters/filterSlice";
 import LeaveDetails from "./LeaveDetails";
 import { useState } from "react";
+import { usePDF } from "react-to-pdf";
 
 
   //for graph
@@ -68,10 +69,15 @@ const handleActionClick = ({employee, leaveData }: any) => {
 
 };
 
+//for export data in pdf
+const { toPDF, targetRef } = usePDF({filename: 'report.pdf'});
+
+
 
     return (
         <div>
-            <UpperPart/>
+            <UpperPart toPDF={toPDF}/>
+            <div ref={targetRef}>
             <div className="flex flex-col lg:flex-row gap-10 mt-5">
                 <div className="lg:w-2/5">
                     <Card className="h-[300px] ">
@@ -167,6 +173,9 @@ const handleActionClick = ({employee, leaveData }: any) => {
                   </TableFooter>
                 </Table>
             </div>
+
+            </div>
+            
         </div>
     );
 };

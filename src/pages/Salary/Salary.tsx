@@ -16,6 +16,7 @@ import { useGetAllSalaryQuery } from "@/redux/features/salary/salaryApi";
 import { useAppSelector } from "@/redux/hook";
 import { FaEllipsis } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import { usePDF } from "react-to-pdf";
 
 const invoices = [
     {
@@ -64,10 +65,14 @@ const Salary = () => {
   return isDepartmentMatch && isEmployeeIDMatch && isDateMatch;
 });
 
+  //for export data in pdf
+  const { toPDF, targetRef } = usePDF({filename: 'report.pdf'});
+
+
     return (
         <div>
-            <UpperPart/>
-            <div className="mt-8 bg-[#F8F8F8] rounded-lg pb-3">
+            <UpperPart toPDF={toPDF}/>
+            <div ref={targetRef} className="mt-8 bg-[#F8F8F8] rounded-lg pb-3">
                 <Table className="">
                   <TableCaption>A list of your Employees Salary.</TableCaption>
                   <TableHeader>

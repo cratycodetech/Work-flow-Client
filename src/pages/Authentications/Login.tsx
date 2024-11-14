@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import Lottie from "lottie-react";
 import loginAnimation from "../../assets/auth/loginAnimation.json"
@@ -18,7 +19,7 @@ type TLoginFormData = {
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const { register, handleSubmit, formState: { errors } } = useForm<TLoginFormData>();
+    const { register, handleSubmit, formState: { errors }, setError } = useForm<TLoginFormData>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [login] = useLoginMutation();
@@ -46,8 +47,12 @@ const Login = () => {
       dispatch(setAdmin({admin: loginInfo, token: token}))
       toast.success("Login Done.", { id: toastId, duration: 2000 });
       navigate("/");
-    } catch (error) {
-      toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+    } catch (error: any) {
+      if (error?.data?.message) {
+        toast.error(error.data.message, { id: toastId, duration: 2000 });
+      } else {
+        toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+      }
     }
   };
 

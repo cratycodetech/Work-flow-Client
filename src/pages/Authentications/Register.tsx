@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Lottie from "lottie-react";
@@ -49,8 +50,12 @@ const Register = () => {
       dispatch(setAdmin({ admin: registerInfo }));
       toast.success("Registration complete.", { id: toastId, duration: 2000 });
       navigate("/login");
-    } catch (error) {
-      toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+    } catch (error: any) {
+      if (error?.data?.message) {
+        toast.error(error.data.message, { id: toastId, duration: 2000 });
+      } else {
+        toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+      }
     }
   };
 
