@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog"
@@ -36,11 +36,13 @@ const COLORS4 = ['#3D5A8F', '#E0E0E0']; // Primary color for completed, grey for
 
 
 
-const AttendanceDetailsModal = () => {
+const AttendanceDetailsModal = ({employee}: {employee: any}) => {
     const [date, setDate] = useState<DateRange | undefined>({
         from: new Date(2022, 0, 20),
         to: addDays(new Date(2022, 0, 20), 20),
       })
+
+    const { employeeId, employeeName} = employee
 
     return (
         <div>
@@ -57,11 +59,11 @@ const AttendanceDetailsModal = () => {
                     <div>
                         <div className="flex items-center justify-start gap-3 rounded-md bg-[#D3D3D3] h-[38px] py-2 pl-4 pr-8">
                             <FaClipboardUser className="w-[14px] h-[18px] text-[#04080F]"></FaClipboardUser>
-                            <p className="text-[#04080F] font-normal text-xs">CXU104</p>
+                            <p className="text-[#04080F] font-normal text-xs">{employeeId}</p>
                         </div>
                         <div className="mt-1 flex items-center justify-start gap-3 rounded-md bg-[#D3D3D3] h-[38px] py-2 pl-4 pr-8">
                             <FaClipboardUser className="w-[14px] h-[18px] text-[#04080F]"></FaClipboardUser>
-                            <p className="text-[#04080F] font-normal text-xs">Rimon Ron</p>
+                            <p className="text-[#04080F] font-normal text-xs">{employeeName}</p>
                         </div>
                     </div>
                     <div>

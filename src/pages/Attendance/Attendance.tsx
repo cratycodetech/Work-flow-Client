@@ -126,7 +126,7 @@ const Attendance = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <AttendanceDetailsModal />
+                    <AttendanceDetailsModal employee={employee} ></AttendanceDetailsModal>
                   </TableCell>
                 </TableRow>
               );

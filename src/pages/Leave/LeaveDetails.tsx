@@ -4,7 +4,6 @@ import { FaBuilding } from "react-icons/fa";
 import { FaCalendarDays } from "react-icons/fa6";
 import { useState } from "react";
 import { format } from "date-fns"
- 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -15,45 +14,19 @@ import {
 } from "@/components/ui/popover"
 import { useGetMonthlyLeaveCountsQuery } from "@/redux/features/leave/leaveApi";
 
-//for table
-const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-  ]
 
 const LeaveDetails = ({selectedEmployee, selectedLeave}: any) => {
-  console.log("selectedLeave",selectedLeave);
-
   const [date, setDate] = useState<Date>()
   // Extract month and year from date
   const year = date?.getFullYear();
-  const month = date?.getMonth() + 1;
+  // const month = date?.getMonth() + 1;
+  const month = (date ?? new Date()).getMonth() + 1;
 
   const {data: getMonthlyLeaveCounts } = useGetMonthlyLeaveCountsQuery({
       employeeId: selectedLeave?.employeeId,
       year,
       month
     })
-    console.log("employeeId", selectedLeave?.employeeId);
-    console.log("year", year);
-    console.log("month", month);
-    console.log("data", getMonthlyLeaveCounts);
 
     return (
         <div className="lg:w-3/5 md:w-full w-full flex flex-col lg:flex-row md:flex-row gap-4 bg-[#F8F8F8] px-2 py-4 rounded-lg lg:h-[300px] ">
@@ -114,16 +87,14 @@ const LeaveDetails = ({selectedEmployee, selectedLeave}: any) => {
                         </TableRow>
                       </TableHeader>
                       <TableBody className="bg-[#FFFFFF01] border">
-                        {invoices.map((invoice) => (
-                          <TableRow key={invoice.invoice} className="border bg-white">
-                            <TableCell className="border border-gray-300">2</TableCell>
-                            <TableCell className="border border-gray-300">4</TableCell>
-                            <TableCell className="border border-gray-300">28</TableCell>
+                          <TableRow key="" className="border bg-white">
+                            <TableCell className="border border-gray-300">{getMonthlyLeaveCounts?.leaveCounts?.['Sick-Leave'] || "0"}</TableCell>
+                            <TableCell className="border border-gray-300">{getMonthlyLeaveCounts?.leaveCounts?.['Paid-Leave'] || "0"}</TableCell>
+                            <TableCell className="border border-gray-300">{getMonthlyLeaveCounts?.leaveCounts?.['Non-Leave'] || "0"}</TableCell>
                             <TableCell className="border border-gray-300"></TableCell>
                             <TableCell className="border border-gray-300"></TableCell>
                             <TableCell className="border border-gray-300"></TableCell>
                           </TableRow>
-                        ))}
                       </TableBody>
                     </Table>
                 </div>
