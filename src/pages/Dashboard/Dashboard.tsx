@@ -51,9 +51,6 @@ const Dashboard = () => {
   const {data: getTodayTotalPresentEmployees} = useGetTodayTotalPresentEmployeeQuery(undefined)
   const {data: getTodayTotalLateEmployees} = useGetTodayTotalLateEmployeeQuery(undefined)
   const {data: getTodayTotalAbsentEmployees} = useGetTodayTotalAbsentEmployeeQuery(undefined)
-  console.log("one",getTodayTotalPresentEmployees);
-  console.log("two",getTodayTotalLateEmployees);
-  console.log("three",getTodayTotalAbsentEmployees);
 
     return (
         <div>

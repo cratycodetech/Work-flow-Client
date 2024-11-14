@@ -1,11 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
+import { useGetAllGeoCodeLocationQuery, useGetSingleEmployeeLocationQuery } from "@/redux/features/geoFencing/geoFencingApi";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import { FaClipboardUser, FaFileLines } from "react-icons/fa6";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell } from "recharts";
+import { MapContainer, TileLayer, Marker, Circle } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { useEffect, useState } from "react";
+
+// Fix for default marker icon not showing in React Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const GeoFencingData = [
   { name: "Group A", value: 100 },
@@ -23,9 +37,73 @@ const violenceData = [
   ];
   const violenceCOLORS = ["#d4d4d8", "#C3190C", "#d4d4d8", "#C3190C"];
 
+  type TFormData = {
+    employeeId: string,
+    employeeName: string,
+    location: string,
+  }
 
 const GeoFencing = () => {
-    const { register } = useForm();
+    const { register, handleSubmit } = useForm<TFormData>();
+    const [formData, setFormData] = useState<TFormData | null>(null);
+    const {data: GeoFencing} = useGetAllGeoCodeLocationQuery(undefined)
+    //get single
+    const { data: singleEmployeeFencing } = useGetSingleEmployeeLocationQuery(
+      formData,
+      { skip: !formData }
+    );
+
+    // State to store center latitude and longitude dynamically
+  const [centerLatitude, setCenterLatitude] = useState<number | null>(null);
+  const [centerLongitude, setCenterLongitude] = useState<number | null>(null);
+  // console.log(singleEmployeeFencing?.employeeId);
+  console.log(centerLatitude);
+  console.log(centerLongitude);
+    
+    // // const { address, employeeId, employeeName, latitude, longitude } = singleEmployeeFencing
+    console.log(singleEmployeeFencing);
+    // console.log(singleEmployeeFencing?.latitude);
+    // console.log(singleEmployeeFencing?.longitude);
+   
+    
+
+  // Check and map over the data
+  const geoLocations = GeoFencing?.data?.map((singleGeo: any) => {
+    const { _id, location, radius } = singleGeo;
+    const [long, lat] = location.coordinates;
+    // Return the my required data
+    return {
+      _id,
+      latitude: parseFloat(lat),
+      longitude: parseFloat(long),
+      radius: parseInt(radius.replace('m', '')), // for ensure the radius is a number
+    };
+  });
+
+  // Form submission handler
+  const onSubmit: SubmitHandler<TFormData> = (data: TFormData) => {
+    const newFormData = {
+      employeeId: data.employeeId,
+      employeeName: data.employeeName,
+      location: data.location,
+    };
+    setFormData(newFormData); 
+
+    // Update the map center based on the selected employee location
+    if (singleEmployeeFencing) {
+      setCenterLatitude(singleEmployeeFencing?.latitude);
+      setCenterLongitude(singleEmployeeFencing?.longitude);
+    }
+  };
+
+    // Update the map center when formData or singleEmployeeFencing changes
+    useEffect(() => {
+      if (singleEmployeeFencing) {
+        setCenterLatitude(singleEmployeeFencing.latitude);
+        setCenterLongitude(singleEmployeeFencing.longitude);
+      }
+    }, [singleEmployeeFencing]);
+
 
     return (
         <div className="flex flex-col md:flex-row lg:flex-row gap-10">
@@ -78,14 +156,15 @@ const GeoFencing = () => {
                     </div>
                 </Card>
                 <Card className="mt-5 py-10">
+                    <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="relative flex items-center rounded-lg px-10">
                         <FaClipboardUser
                           className="absolute w-[40px] text-[#D3D3D3]"
                         />
                       <input
                         className="pl-10 border shadow text-xs rounded w-full py-3 px-3 text-[#D3D3D3]"
-                        {...register("id")}
-                        name="id"
+                        {...register("employeeId")}
+                        name="employeeId"
                         placeholder="Employee ID"
                       />
                     </div>
@@ -95,8 +174,8 @@ const GeoFencing = () => {
                         />
                       <input
                         className="pl-10 my-4 border shadow text-xs rounded w-full py-3 px-3 text-[#D3D3D3]"
-                        {...register("name")}
-                        name="name"
+                        {...register("employeeName")}
+                        name="employeeName"
                         placeholder="Employee Name"
                       />
                     </div>
@@ -106,35 +185,75 @@ const GeoFencing = () => {
                         />
                       <input
                         className="pl-10 border shadow text-xs rounded w-full py-3 px-3 text-[#D3D3D3]"
-                        {...register("address")}
-                        name="address"
+                        {...register("location")}
+                        name="location"
                         placeholder="Employee Address"
                       />
                     </div>
 
                     <div className="flex gap-5 items-center justify-end mt-10 mr-10">
-                        <Button className="text-xs rounded-md bg-[#3D5A8F] text-[#F8F8F8]">
+                        {/* <Button className="text-xs rounded-md bg-[#3D5A8F] text-[#F8F8F8]">
                             <FaFileLines></FaFileLines>
                             <span>Generate reports</span>
-                        </Button>
+                        </Button> */}
                         <Button className="text-xs rounded-md bg-[#459895] text-[#F8F8F8]">
                             <FaSearch></FaSearch>
                             <span>Search</span>
                         </Button>
                     </div>
+
+                    </form>
                 </Card>
             </div>
             <div className="lg:w-3/5">
                 <div className="w-full h-72 md:h-[380px] border-0 overflow-hidden rounded-lg">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29199.778834555593!2d90.43375574430222!3d23.819582092385446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c62fce7d991f%3A0xacfaf1ac8e944c05!2sBasundhara%20Residential%20Area%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1730802618025!5m2!1sen!2sbd" 
-                        className="w-full h-[400px] rounded-lg" 
-                        // allowfullscreen="" 
-                        loading="lazy" 
-                        // referrerpolicy="no-referrer-when-downgrade"
-                        >
-                    </iframe>
+                <MapContainer
+                  center={
+                    centerLatitude && centerLongitude
+                      ? [centerLatitude, centerLongitude] // Use state values if available
+                      : geoLocations?.[0] 
+                      ? [geoLocations[0].latitude, geoLocations[0].longitude] // Use the first location from geoLocations if available
+                      : [23.73929105, 90.40722897981641] // Default values if neither is available
+                  }
+                  zoom={15}
+                  style={{ height: "380px", width: "100%" }}
+                  className="rounded-lg"
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                
+                  {/* Render the employee's fencing marker first if available */}
+                  {singleEmployeeFencing?.latitude && singleEmployeeFencing?.longitude ? (
+                    <Marker
+                      key="employee-marker" // Unique key for the employee marker
+                      position={[singleEmployeeFencing.latitude, singleEmployeeFencing.longitude]}
+                    >
+                      <Circle
+                        center={[singleEmployeeFencing.latitude, singleEmployeeFencing.longitude]}
+                        radius={singleEmployeeFencing.radius || 100} // Use default radius if not available
+                        pathOptions={{ fillColor: "#459895", color: "#459895" }}
+                      />
+                    </Marker>
+                  ) : (
+                    // Fallback to rendering markers from geoLocations if singleEmployeeFencing is not available
+                    geoLocations?.map((location: any) => (
+                      <Marker key={location._id} position={[location.latitude, location.longitude]}>
+                        <Circle
+                          center={[location.latitude, location.longitude]}
+                          radius={location.radius}
+                          pathOptions={{
+                            color: "#459895",
+                            fillColor: "#459895",
+                            fillOpacity: 0.2,
+                          }}
+                        />
+                      </Marker>
+                    ))
+                  )}
+                </MapContainer>
+
+
                 </div>
+                
                 <Card className="px-10 py-6 mt-5">
                     <h1 className="text-sm text-[#04080F]">History</h1>
                     <Card className="mt-5 bg-[#F8F8F8] flex flex-row items-center justify-center gap-5 py-2 px-2">

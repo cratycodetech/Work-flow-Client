@@ -29,10 +29,12 @@ const Announcement = () => {
   const queryClient = useQueryClient();
   const {data: getAllAnnouncement} = useGetAllAnnouncementQuery(undefined)
   const [deleteAnnouncement] = useDeleteAnnouncementMutation()
+//second form
+  const { register: registerSecond, handleSubmit: handleSubmitSecond, setValue: setValueSecond, formState: { errors: errorsSecond } } = useForm<TFormData>();
 
 
-  //handle form
-  const onSubmit : SubmitHandler<TFormData> = async (data) => {
+  //handle first form
+  const onSubmitFirst : SubmitHandler<TFormData> = async (data) => {
     const toastId = toast.loading("announcement in");
     try {
       const formInfo = {
@@ -44,6 +46,25 @@ const Announcement = () => {
       toast.success("Announcement Done.", { id: toastId, duration: 2000 });
       queryClient.invalidateQueries("announcement");
       
+    } catch (error) {
+      toast.error("Something went wrong!", { id: toastId, duration: 2000 });
+    }
+  };
+
+   // Second form submit handler
+   const onSubmitSecond: SubmitHandler<TFormData> = async (data) => {
+    const toastId = toast.loading("Sending employee announcement...");
+    try {
+      const formInfo = {
+        employeeId: data.employeeId,
+        departmentName: data.departmentName,
+        description: data.description,
+      };
+
+      await addAnnouncement(formInfo);
+      toast.success("Employee announcement sent.", { id: toastId, duration: 2000 });
+      queryClient.invalidateQueries("announcement");
+
     } catch (error) {
       toast.error("Something went wrong!", { id: toastId, duration: 2000 });
     }
@@ -81,7 +102,7 @@ const Announcement = () => {
                             <h1 className="text-xl font-semibold leading-7">Announcement</h1> 
                         </div>                     
 
-                        <form onSubmit={handleSubmit(onSubmit)}>
+                        <form onSubmit={handleSubmit(onSubmitFirst)}>
                           <div className="flex items-center justify-between gap-8">
                             <div>
                               <p className="text-xs">Select Department</p>
@@ -142,7 +163,7 @@ const Announcement = () => {
                         <h1 className="text-xl font-semibold leading-7">Employee Announcement</h1>
                       </div>
                     
-                      <form onSubmit={handleSubmit(onSubmit)}>
+                      <form onSubmit={handleSubmitSecond(onSubmitSecond)}>
                         <div className="flex items-center justify-between gap-8">
                           <div>
                             <p className="text-xs">Employee Details</p>
@@ -153,19 +174,19 @@ const Announcement = () => {
                               <FaClipboardUser className="absolute right-2" />
                               <input
                                 className="shadow text-sm bg-opacity-15 rounded w-full py-3 px-3 text-[#459895]"
-                                {...register("employeeId")}
+                                {...registerSecond("employeeId")}
                                 name="employeeId"
                                 placeholder="Employee ID"
                               />
-                              {errors.employeeId && (
-                                <p className="text-red-500 text-xs mt-1">{errors.employeeId.message}</p>
+                              {errorsSecond.employeeId && (
+                                <p className="text-red-500 text-xs mt-1">{errorsSecond.employeeId.message}</p>
                               )}
                             </div>
                            
                             <div>
                               <Select
-                                {...register("departmentName", { required: "Please select a department" })}
-                                onValueChange={(value) => setValue("departmentName", value)}
+                                {...registerSecond("departmentName", { required: "Please select a department" })}
+                                onValueChange={(value) => setValueSecond("departmentName", value)}
                               >
                                 <SelectTrigger className="w-[128px] h-[45px] bg-[#F8F8F8] text-[#459895] font-normal text-sm">
                                   <SelectValue placeholder="Select Department" />
@@ -187,8 +208,8 @@ const Announcement = () => {
                               </Select>
                           
                               {/* Show validation error message if any */}
-                              {errors.departmentName && (
-                                <p className="text-red-500 text-xs mt-1">{errors?.departmentName?.message}</p>
+                              {errorsSecond.departmentName && (
+                                <p className="text-red-500 text-xs mt-1">{errorsSecond?.departmentName?.message}</p>
                               )}
                             </div>
                           </div>
@@ -196,13 +217,13 @@ const Announcement = () => {
                     
                         <div className="mt-5 flex items-center rounded-lg bg-[#3D5A8F] text-[#F8F8F8] ">
                           <textarea
-                            {...register("description", { required: "description is required" })} // Register the textarea
+                            {...registerSecond("description", { required: "description is required" })} // Register the textarea
                             className="w-full  bg-[#3D5A8F] text-[#F8F8F8] h-[150px] p-3 border rounded-md focus:outline-none focus:ring focus:ring-[#459895] text-sm"
                             placeholder="Write an announcement."
                           ></textarea>
                         </div>
-                        {errors.description && (
-                          <p className="text-red-500 text-xs mt-1">{errors?.description?.message}</p>
+                        {errorsSecond.description && (
+                          <p className="text-red-500 text-xs mt-1">{errorsSecond?.description?.message}</p>
                         )}
                     
                         <Button type="submit" className="bg-[#F8F8F8] text-[#459895] text-xs mt-3">

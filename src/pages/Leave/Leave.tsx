@@ -16,11 +16,22 @@ import {
   } from "@/components/ui/table"
 import { FaEllipsis } from "react-icons/fa6";
 import { useGetAllEmployeeQuery } from "@/redux/features/employee/employeeApi";
-import { useGetAllLeaveQuery } from "@/redux/features/leave/leaveApi";
+import { useGetAllLeaveQuery, useGetMonthlyLeaveCountsQuery } from "@/redux/features/leave/leaveApi";
 import { useAppSelector } from "@/redux/hook";
 import { selectFilter } from "@/redux/features/filters/filterSlice";
 import LeaveDetails from "./LeaveDetails";
 import { useState } from "react";
+import { FaCalendarDays } from "react-icons/fa6";
+import { format } from "date-fns"
+ 
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 
   //for graph
@@ -30,15 +41,42 @@ const data = [
   { name: 'Leave 3', value: 9, color: '##459895' },   // Teal color
 ];
 
+//for table
+const invoices = [
+  {
+    invoice: "INV001",
+    paymentStatus: "Paid",
+    totalAmount: "$250.00",
+    paymentMethod: "Credit Card",
+  },
+  {
+    invoice: "INV002",
+    paymentStatus: "Pending",
+    totalAmount: "$150.00",
+    paymentMethod: "PayPal",
+  },
+  {
+    invoice: "INV003",
+    paymentStatus: "Unpaid",
+    totalAmount: "$350.00",
+    paymentMethod: "Bank Transfer",
+  },
+]
+
 const Leave = () => {
+    // const [date, setDate] = useState<Date>()
     const { data: GetAllEmployee } = useGetAllEmployeeQuery(undefined);
     const { data: GetAllLeave } = useGetAllLeaveQuery(undefined);
+
     //state for details
     const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [selectedLeave, setSelectedLeave] = useState(null);
+    
+
+    
 
     //for filter
     const filters = useAppSelector(selectFilter);
-
   //get others data for show all table column
     const getLeaveData = (employeeId: string) => {
       const leaveData = GetAllLeave?.data?.find(
@@ -51,7 +89,6 @@ const Leave = () => {
  const filteredEmployees = GetAllEmployee?.data.filter((employee: any) => {
   const isDepartmentMatch = filters.department ? employee.departmentName === filters.department : true;
   const isEmployeeIDMatch = filters.employeeID ? employee.employeeId === filters.employeeID : true;
-
   // Normalize both the joiningDate and the selected date to YYYY-MM-DD format for comparison
   const employeeJoiningDate = employee.joiningDate ? employee.joiningDate.split('T')[0] : null;
   const isDateMatch = filters.date ? employeeJoiningDate === filters.date : true;
@@ -60,8 +97,10 @@ const Leave = () => {
 });
 
 // Handler for clicking the action icon
-const handleActionClick = (employee: any) => {
+const handleActionClick = ({employee, leaveData }) => {
   setSelectedEmployee(employee);
+  setSelectedLeave(leaveData);
+
 };
 
 
@@ -102,7 +141,81 @@ const handleActionClick = (employee: any) => {
                         </CardContent>
                     </Card>
                 </div>
-                <LeaveDetails selectedEmployee={selectedEmployee}></LeaveDetails>
+                <LeaveDetails selectedEmployee={selectedEmployee} selectedLeave={selectedLeave}></LeaveDetails>
+
+                {/* <div className="lg:w-3/5 md:w-full w-full flex flex-col lg:flex-row md:flex-row gap-4 bg-[#F8F8F8] px-2 py-4 rounded-lg lg:h-[300px] ">
+            <div className="lg:w-4/12 md:w-4/12 w-full">
+                <p className="bg-[#D3D3D3] text-[#7C7C7C] font-normal text-xs py-2 px-4">Employee ID</p>
+                <p className="bg-[#F3F4F8] text-[#7C7C7C] font-normal text-xs py-4 px-4">{selectedEmployee?.employeeId}</p>
+                <p className="bg-[#D3D3D3] text-[#7C7C7C] font-normal text-xs py-2 px-4">Employee Name</p>
+                <div className="bg-[#F3F4F8] text-[#7C7C7C] font-normal text-xs py-4 px-4 flex items-center justify-start gap-2">
+                    <img className="w-[18px] h-[18px] rounded-full" src="https://i.ibb.co.com/fCx3Y8R/Ellipse-1.webp" alt="" />
+                    <p className="leading-[18px] text-xs">{selectedEmployee?.employeeName}</p>
+                </div>
+                <p className="bg-[#D3D3D3] text-[#7C7C7C] font-normal text-xs py-2 px-4">Department</p>
+                <div className="bg-[#F3F4F8] text-[#7C7C7C] font-normal text-xs py-4 px-4 flex items-center justify-start gap-2">
+                    <FaBuilding className="w-[18px] h-[18px]"></FaBuilding>
+                    <p className="leading-[18px] text-xs">{selectedEmployee?.departmentName}</p>
+                </div>
+            </div>
+            <div className="lg:w-8/12 md:w-8/12 w-full">
+                <div className="flex items-center justify-between w-full">
+                    <div>
+                        <p className="text-[#7C7C7C] text-xs font-normal">Leave data</p>
+                    </div>
+                    <div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                            //   variant={"outline"}
+                              className={cn(
+                                "w-[185px]  p-[10px] gap-2 justify-start text-left font-normal bg-[#3D5A8F] text-[#F8F8F8]",
+                                !date && "text-muted-foreground"
+                              )}
+                            >
+                              <FaCalendarDays className="text-[#F8F8F8] rounded-md"></FaCalendarDays>
+                              {date ? format(date, "PPP") : <span className="text-[#F8F8F8]">Date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={date}
+                              onSelect={setDate}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                    </div>
+                </div>
+                <div className="mt-5 bg-[#F8F8F8] rounded-lg pb-3 pt-1">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="bg-[#0000000F] text-[#7C7C7C] text-[10px] font-normal border border-gray-300">Sick Leave</TableHead>
+                          <TableHead className="bg-[#0000000F] text-[#7C7C7C] text-[10px] font-normal border border-gray-300">Paid Leave</TableHead>
+                          <TableHead className="bg-[#0000000F] text-[#7C7C7C] text-[10px] font-normal border border-gray-300">Non Leave</TableHead>
+                          <TableHead className="bg-[#0000000F] text-[#7C7C7C] text-[10px] font-normal border border-gray-300"></TableHead>
+                          <TableHead className="bg-[#0000000F] text-[#7C7C7C] text-[10px] font-normal border border-gray-300"> </TableHead>
+                          <TableHead className="bg-[#0000000F] text-[#7C7C7C] text-[10px] font-normal border border-gray-300"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="bg-[#FFFFFF01] border">
+                        {invoices.map((invoice) => (
+                          <TableRow key={invoice.invoice} className="border bg-white">
+                            <TableCell className="border border-gray-300">2</TableCell>
+                            <TableCell className="border border-gray-300">4</TableCell>
+                            <TableCell className="border border-gray-300">28</TableCell>
+                            <TableCell className="border border-gray-300"></TableCell>
+                            <TableCell className="border border-gray-300"></TableCell>
+                            <TableCell className="border border-gray-300"></TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                </div>
+            </div>
+        </div> */}
             </div>
 
             <div className="mt-5 bg-[#F8F8F8] rounded-lg pb-3 pt-1">
@@ -154,7 +267,7 @@ const handleActionClick = (employee: any) => {
                             {/* <Button className="  h-[16px] text-xs rounded-md"> */}
                                 {/* <FaFileLines></FaFileLines> */}
                                {/* </Button> */}
-                               <FaEllipsis onClick={() => handleActionClick(employee)} className="h-[20px] w-[20px] text-[#7C7C7C] mx-auto"></FaEllipsis>
+                               <FaEllipsis onClick={() => handleActionClick({employee, leaveData})} className="h-[20px] w-[20px] text-[#7C7C7C] mx-auto"></FaEllipsis>
                         </TableCell>
                       </TableRow>
                        );

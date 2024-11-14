@@ -1,6 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FaBuilding } from "react-icons/fa";
+import { FaCalendarDays } from "react-icons/fa6";
+import { useState } from "react";
+import { format } from "date-fns"
+ 
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { useGetMonthlyLeaveCountsQuery } from "@/redux/features/leave/leaveApi";
 
 //for table
 const invoices = [
@@ -24,8 +37,23 @@ const invoices = [
     },
   ]
 
-const LeaveDetails = ({selectedEmployee}: any) => {
-    // console.log(selectedEmployee);
+const LeaveDetails = ({selectedEmployee, selectedLeave}: any) => {
+  console.log("selectedLeave",selectedLeave);
+
+  const [date, setDate] = useState<Date>()
+  // Extract month and year from date
+  const year = date?.getFullYear();
+  const month = date?.getMonth() + 1;
+
+  const {data: getMonthlyLeaveCounts } = useGetMonthlyLeaveCountsQuery({
+      employeeId: selectedLeave?.employeeId,
+      year,
+      month
+    })
+    console.log("employeeId", selectedLeave?.employeeId);
+    console.log("year", year);
+    console.log("month", month);
+    console.log("data", getMonthlyLeaveCounts);
 
     return (
         <div className="lg:w-3/5 md:w-full w-full flex flex-col lg:flex-row md:flex-row gap-4 bg-[#F8F8F8] px-2 py-4 rounded-lg lg:h-[300px] ">
@@ -48,7 +76,7 @@ const LeaveDetails = ({selectedEmployee}: any) => {
                     <div>
                         <p className="text-[#7C7C7C] text-xs font-normal">Leave data</p>
                     </div>
-                    {/* <div>
+                    <div>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
@@ -71,7 +99,7 @@ const LeaveDetails = ({selectedEmployee}: any) => {
                             />
                           </PopoverContent>
                         </Popover>
-                    </div> */}
+                    </div>
                 </div>
                 <div className="mt-5 bg-[#F8F8F8] rounded-lg pb-3 pt-1">
                     <Table>
