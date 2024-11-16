@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import { FaCloudDownloadAlt } from "react-icons/fa";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { useGetMonthlySingleEmployeeAttendanceCountQuery, useGetMonthlySingleEmployeeLateCountQuery } from "@/redux/features/attendance/attendanceApi";
 
 
 const data1 = [{ name: 'Present', value: 27 }, { name: 'Absent', value: 27 }];
@@ -41,8 +42,46 @@ const AttendanceDetailsModal = ({employee}: {employee: any}) => {
         from: new Date(2022, 0, 20),
         to: addDays(new Date(2022, 0, 20), 20),
       })
+    const { _id, employeeId, employeeName} = employee
 
-    const { employeeId, employeeName} = employee
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1; // `getMonth()` returns 0-based month
+    const currentYear = today.getFullYear();
+    
+    // Use for present and absent graph
+    const { data: getPresentAndAbsentCount } = useGetMonthlySingleEmployeeAttendanceCountQuery({
+        employeeId: _id,
+        month: currentMonth,
+        year: currentYear,
+    });
+    // Determine present data whether to use API data or dummy data
+    const presentData = getPresentAndAbsentCount && Object.keys(getPresentAndAbsentCount).length > 0
+      ? [
+          { name: "Present", value: getPresentAndAbsentCount?.present },
+          { name: "Absent", value: getPresentAndAbsentCount?.totalAbssent },
+        ]
+      : data1;
+    //absent data
+    const AbsentData = getPresentAndAbsentCount && Object.keys(getPresentAndAbsentCount).length > 0
+      ? [
+          { name: "Absent", value: getPresentAndAbsentCount?.totalAbssent },
+          { name: "Other", value: 30 - getPresentAndAbsentCount?.totalAbssent }, // Example logic
+        ]
+      : data2;
+
+    //for late graph
+    const {data: getLateCount} = useGetMonthlySingleEmployeeLateCountQuery({
+        employeeId: _id,
+        month: currentMonth,
+        year: currentYear,
+    })
+    //late data
+    const lateData = getLateCount && Object.keys(getLateCount).length > 0
+      ? [
+          { name: "Late", value: getLateCount?.totalLateArrival },
+          { name: "Other", value: getLateCount?.totalNotLateArrival },
+        ]
+      : data3;
 
     return (
         <div>
@@ -126,14 +165,14 @@ const AttendanceDetailsModal = ({employee}: {employee: any}) => {
                     <ResponsiveContainer width={120} height={120}>
                       <PieChart>
                         <Pie
-                          data={data1}
+                          data={presentData}
                           dataKey="value"
                           innerRadius={30}
                           outerRadius={55}
                           startAngle={90}
                           endAngle={-270}
                         >
-                          {data1.map((_entry, index) => (
+                          {presentData.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS1[index % COLORS1.length]} />
                           ))}
                         </Pie>
@@ -146,7 +185,8 @@ const AttendanceDetailsModal = ({employee}: {employee: any}) => {
                           fontSize="14px"
                           fontWeight="semibold"
                         >
-                          27 Days
+                          {getPresentAndAbsentCount?.present} Days
+                          {/* 27 Days */}
                         </text>
                         <Tooltip />
                       </PieChart>
@@ -162,14 +202,14 @@ const AttendanceDetailsModal = ({employee}: {employee: any}) => {
                     <ResponsiveContainer width={120} height={120}>
                       <PieChart>
                         <Pie
-                          data={data2}
+                          data={AbsentData}
                           dataKey="value"
                           innerRadius={30}
                           outerRadius={55}
                           startAngle={90}
                           endAngle={-270}
                         >
-                          {data2.map((_entry, index) => (
+                          {AbsentData.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS2[index % COLORS2.length]} />
                           ))}
                         </Pie>
@@ -182,7 +222,8 @@ const AttendanceDetailsModal = ({employee}: {employee: any}) => {
                           fontSize="14px"
                           fontWeight="semibold"
                         >
-                          5 Days
+                          {/* 5 Days */}
+                          {getPresentAndAbsentCount?.totalAbssent} Days
                         </text>
                         <Tooltip />
                       </PieChart>
@@ -199,14 +240,14 @@ const AttendanceDetailsModal = ({employee}: {employee: any}) => {
                     <ResponsiveContainer width={120} height={120}>
                       <PieChart>
                         <Pie
-                          data={data3}
+                          data={lateData}
                           dataKey="value"
                           innerRadius={30}
                           outerRadius={55}
                           startAngle={90}
                           endAngle={-270}
                         >
-                          {data3.map((_entry, index) => (
+                          {lateData.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS3[index % COLORS3.length]} />
                           ))}
                         </Pie>
@@ -219,7 +260,8 @@ const AttendanceDetailsModal = ({employee}: {employee: any}) => {
                           fontSize="14px"
                           fontWeight="semibold"
                         >
-                          3 Days
+                          {/* 3 Days */}
+                          {getLateCount?.totalLateArrival} Days
                         </text>
                         <Tooltip />
                       </PieChart>

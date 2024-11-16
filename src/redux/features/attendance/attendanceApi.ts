@@ -102,6 +102,29 @@ const attendanceApi = baseApi.injectEndpoints({
             }),
             providesTags: ['attendance'],
         }),
+        // //use for graph present and absent
+        // GetMonthlySingleEmployeeAttendanceCount: builder.query({
+        //     query: (employeeId) =>({
+        //         url: `/attendance/monthly/${employeeId}`,
+        //         method: "GET",
+        //     }),
+        //     providesTags: ['attendance'],
+        // }),
+        GetMonthlySingleEmployeeAttendanceCount: builder.query({
+            query: ({ employeeId, month, year }) => ({
+                url: `/attendance/monthly/${employeeId}?month=${month}&year=${year}`,
+                method: "GET",
+            }),
+            providesTags: ['attendance'],
+        }),
+        //use for graph
+        GetMonthlySingleEmployeeLateCount: builder.query({
+            query: ({ employeeId, month, year }) =>({
+                url: `/attendance/monthly-late/${employeeId}?month=${month}&year=${year}`,
+                method: "GET",
+            }),
+            providesTags: ['attendance'],
+        }),
     })
 })
 
@@ -118,5 +141,7 @@ export const {
     useUpdateEmployeeAttendanceMutation,
     useDeleteEmployeeAttendanceMutation,
     useGetTodayPresentCountEmployeeQuery,
-    useGetTodayAbsentCountEmployeeQuery
+    useGetTodayAbsentCountEmployeeQuery,
+    useGetMonthlySingleEmployeeAttendanceCountQuery,
+    useGetMonthlySingleEmployeeLateCountQuery
 } = attendanceApi;

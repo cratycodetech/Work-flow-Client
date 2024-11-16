@@ -59,8 +59,8 @@ const Dashboard = () => {
   const {data: getPresentCount} = useGetTodayPresentCountEmployeeQuery(undefined)
   const {data: getAbsentCount} = useGetTodayAbsentCountEmployeeQuery(undefined)
   // Fallback to dummy data if count is 0
-  const presentData = getPresentCount?.count > 0 ? getPresentCount : { Distribution: 80 }; // Replace with a dummy value
-  const absentData = getAbsentCount?.count > 0 ? getAbsentCount : { name: "Absent", count: 80 }; // Replace with a dummy value
+  const presentData = getPresentCount?.count > 0 ? getPresentCount : { name: "Absent", count: 79 }; // Replace with a dummy value
+  const absentData = getAbsentCount?.count > 0 ? getAbsentCount : { name: "Absent", count: 21 }; // Replace with a dummy value
   const chartData = [presentData, absentData];
 
   //for leave status graph
