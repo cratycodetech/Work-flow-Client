@@ -29,20 +29,6 @@ const leaveApi = baseApi.injectEndpoints({
                 return `/leave/leave-counts?${params.toString()}`;
             },
         }),
-        // getMonthlyLeaveCounts: builder.query({
-        //     query: (leaveInfo) => ({
-        //       url: "/leave/leave-counts",
-        //       method: "GET",
-        //       params: {
-        //         employeeId: leaveInfo.employeeId,  // Pass employeeId as query parameter
-        //         year: leaveInfo.year,              // Pass year as query parameter
-        //         month: leaveInfo.month,            // Pass month as query parameter
-        //       }
-        //     }),
-        //     providesTags: ['leave'],
-        // }),
-
-
         GetSingleLeave: builder.query({
             query: (leaveId) =>({
                 url: `/leave/single/${leaveId}`,
@@ -53,6 +39,14 @@ const leaveApi = baseApi.injectEndpoints({
         getCountLeaveType: builder.query({
             query: (leaveInfo) =>({
                 url: "/leave/type",
+                method: "GET",
+                body: leaveInfo
+            }),
+            providesTags: ['leave'],
+        }),
+        getTodayLeaveStatusCount: builder.query({
+            query: (leaveInfo) =>({
+                url: "/leave/today-leave-status-counts",
                 method: "GET",
                 body: leaveInfo
             }),
@@ -91,4 +85,6 @@ export const {
     useGetCountLeaveTypeQuery,
     useCreateLeaveMutation,
     useUpdateLeaveMutation,
-    useDeleteLeaveMutation} = leaveApi;
+    useDeleteLeaveMutation,
+    useGetTodayLeaveStatusCountQuery
+} = leaveApi;

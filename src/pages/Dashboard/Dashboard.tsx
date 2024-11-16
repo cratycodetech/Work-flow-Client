@@ -7,32 +7,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useGetAllEmployeeQuery, useGetTotalEmployeeQuery } from "@/redux/features/adminDashboard/adminDashboardApi";
+import { useGetTotalEmployeeQuery } from "@/redux/features/adminDashboard/adminDashboardApi";
 import { useGetLatestAnnouncementQuery } from "@/redux/features/announcement/announcementApi";
-import { useGetTodayTotalAbsentEmployeeQuery, useGetTodayTotalLateEmployeeQuery, useGetTodayTotalPresentEmployeeQuery } from "@/redux/features/attendance/attendanceApi";
+import { useGetTodayAbsentCountEmployeeQuery, useGetTodayPresentCountEmployeeQuery, useGetTodayTotalAbsentEmployeeQuery, useGetTodayTotalLateEmployeeQuery, useGetTodayTotalPresentEmployeeQuery } from "@/redux/features/attendance/attendanceApi";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { FaBullhorn, FaCalendarCheck, FaClock, FaUserClock } from "react-icons/fa"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Legend, Cell, Label } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Legend, Cell } from 'recharts';
 import moment from "moment";
+import { useGetTodayLeaveStatusCountQuery } from "@/redux/features/leave/leaveApi";
+import { useGetCountDeductionSalaryQuery, useGetCountDistributionSalaryQuery, useGetCountPendingSalaryQuery } from "@/redux/features/salary/salaryApi";
 
 // Define the data for the pie chart
-const PieData = [
-  { name: 'Approved', value: 100 },
-  { name: 'Pending', value: 10 },
-  { name: 'Denied', value: 20 },
-];
+// const PieData = [
+//   { name: 'Approved', value: 100 },
+//   { name: 'Pending', value: 10 },
+//   { name: 'Denied', value: 20 },
+// ];
 // Define colors for the pie chart slices
 const COLORS = ['#3D5A8F', '#459895', '#E0D59A'];
 
-const data = [
-    { name: 'Present', value: 21 },
-    { name: 'Absent', value: 79 },
-];
+// //dummy data for Attendance Summary but did not use
+// const data = [
+//     { name: 'Present', value: 21 },
+//     { name: 'Absent', value: 79 },
+// ];
 
-export const salaryData = [
-  { name: "Salary Overview", Distribution: 80, Pendings: 60, Deductions: 20 },
-];
+// const salaryData = [
+//   { name: "Salary Overview", Distribution: 80, Pendings: 60, Deductions: 20 },
+// ];
  export const SalaryCOLORS = ['#3D5A8F', '#459895', '#E0D59A'];
 
 
@@ -51,6 +54,50 @@ const Dashboard = () => {
   const {data: getTodayTotalPresentEmployees} = useGetTodayTotalPresentEmployeeQuery(undefined)
   const {data: getTodayTotalLateEmployees} = useGetTodayTotalLateEmployeeQuery(undefined)
   const {data: getTodayTotalAbsentEmployees} = useGetTodayTotalAbsentEmployeeQuery(undefined)
+
+  //for attendance summary graph
+  const {data: getPresentCount} = useGetTodayPresentCountEmployeeQuery(undefined)
+  const {data: getAbsentCount} = useGetTodayAbsentCountEmployeeQuery(undefined)
+  // Fallback to dummy data if count is 0
+  const presentData = getPresentCount?.count > 0 ? getPresentCount : { Distribution: 80 }; // Replace with a dummy value
+  const absentData = getAbsentCount?.count > 0 ? getAbsentCount : { name: "Absent", count: 80 }; // Replace with a dummy value
+  const chartData = [presentData, absentData];
+
+  //for leave status graph
+  const {data: getTodayLeaveStatusCount} = useGetTodayLeaveStatusCountQuery(undefined)
+  // Fallback to dummy values if API data has zero or undefined values
+    const leaveChartData = [
+      {
+        name: "Approved",
+        value: getTodayLeaveStatusCount?.approved > 0 ? getTodayLeaveStatusCount.approved : 100,
+      },
+      {
+        name: "Pending",
+        value: getTodayLeaveStatusCount?.pending > 0 ? getTodayLeaveStatusCount.pending : 10,
+      },
+      {
+        name: "Denied",
+        value: getTodayLeaveStatusCount?.denied > 0 ? getTodayLeaveStatusCount.denied : 20,
+      },
+    ];
+
+  //for salary overview graph
+  const {data: getCountDistributionSalary} = useGetCountDistributionSalaryQuery(undefined)
+  const {data: getCountDeductionSalary} = useGetCountDeductionSalaryQuery(undefined)
+  const {data: getCountPendingSalary} = useGetCountPendingSalaryQuery(undefined)
+  // Fallback to dummy data if count is 0 or the data is undefined
+  const distributionValue = getCountDistributionSalary?.count > 0 ? getCountDistributionSalary.count : 80;
+  const deductionValue = getCountDeductionSalary?.count > 0 ? getCountDeductionSalary.count : 20;
+  const pendingValue = getCountPendingSalary?.count > 0 ? getCountPendingSalary.count : 60;
+  // Prepare the data for the chart
+  const salaryChartData = [
+    {
+      name: "Salary Overview",
+      Distribution: distributionValue,
+      Pendings: pendingValue,
+      Deductions: deductionValue,
+    },
+  ];
 
     return (
         <div>
@@ -106,7 +153,7 @@ const Dashboard = () => {
                         <CardContent>
                             <ResponsiveContainer width="100%" height={300}>
                                 <BarChart
-                                    data={data}
+                                    data={chartData}
                                     margin={{
                                         top: 0,
                                         right: 20,
@@ -117,8 +164,8 @@ const Dashboard = () => {
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="name" />
                                     <YAxis ticks={[0, 20, 40, 60, 80]} domain={[0, 80]} />
-                                    <Tooltip formatter={(value) => `${value}%`} />
-                                    <Bar dataKey="value" fill="#4B6DAA" barSize={40} />
+                                    <Tooltip formatter={(count) => `${count}%`} />
+                                    <Bar dataKey="count" fill="#4B6DAA" barSize={40} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -139,7 +186,7 @@ const Dashboard = () => {
                                         marginTop: '-100px',
                                         marginLeft: '200px',
                                       }}
-                                    payload={PieData.map((entry, index) => ({
+                                    payload={leaveChartData?.map((entry, index) => ({
                                       id: entry.name,
                                       type: 'circle',
                                       value: entry.name,
@@ -148,7 +195,7 @@ const Dashboard = () => {
                                   />
                             
                                   <Pie
-                                    data={PieData}
+                                    data={leaveChartData}
                                     cx={-30}
                                     cy={85}
                                     innerRadius={50}
@@ -157,7 +204,7 @@ const Dashboard = () => {
                                     // paddingAngle={0}
                                     dataKey="value"
                                   >
-                                    {PieData?.map((_entry, index) => (
+                                    {leaveChartData?.map((_entry, index) => (
                                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                   </Pie>
@@ -176,7 +223,7 @@ const Dashboard = () => {
                             <ResponsiveContainer width="100%" height={150}>
                               <BarChart
                                 layout="vertical"
-                                data={salaryData}
+                                data={salaryChartData}
                                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                                 barSize={20}
                               >

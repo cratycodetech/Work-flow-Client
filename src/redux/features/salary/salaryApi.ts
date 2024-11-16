@@ -17,7 +17,37 @@ const salaryApi = baseApi.injectEndpoints({
             }),
             providesTags: ['salary'],
         }),
+        getCountDistributionSalary: builder.query({
+            query: (salaryInfo) =>({
+                url: "/salary/distribution",
+                method: "GET",
+                body: salaryInfo
+            }),
+            providesTags: ['salary'],
+        }),
+        getCountDeductionSalary: builder.query({
+            query: (salaryInfo) =>({
+                url: "/salary/deduction",
+                method: "GET",
+                body: salaryInfo
+            }),
+            providesTags: ['salary'],
+        }),
+        getCountPendingSalary: builder.query({
+            query: (salaryInfo) =>({
+                url: "/salary/pending",
+                method: "GET",
+                body: salaryInfo
+            }),
+            providesTags: ['salary'],
+        }),
     })
 })
 
-export const { useGetAllSalaryQuery, useGetSingleSalaryQuery} = salaryApi;
+export const {
+     useGetAllSalaryQuery, 
+     useGetSingleSalaryQuery,
+     useGetCountDistributionSalaryQuery,
+     useGetCountPendingSalaryQuery,
+     useGetCountDeductionSalaryQuery
+    } = salaryApi;

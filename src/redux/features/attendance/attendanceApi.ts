@@ -86,6 +86,22 @@ const attendanceApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['attendance'],
         }),
+        getTodayPresentCountEmployee: builder.query({
+            query: (countInfo) =>({
+                url: "/attendance/countPresent",
+                method: "GET",
+                body: countInfo
+            }),
+            providesTags: ['attendance'],
+        }),
+        getTodayAbsentCountEmployee: builder.query({
+            query: (countInfo) =>({
+                url: "/attendance/countAbsent",
+                method: "GET",
+                body: countInfo
+            }),
+            providesTags: ['attendance'],
+        }),
     })
 })
 
@@ -100,4 +116,7 @@ export const {
     useGetSingleEmployeeAttendanceQuery,
     useCreateEmployeeAttendanceMutation,
     useUpdateEmployeeAttendanceMutation,
-    useDeleteEmployeeAttendanceMutation} = attendanceApi;
+    useDeleteEmployeeAttendanceMutation,
+    useGetTodayPresentCountEmployeeQuery,
+    useGetTodayAbsentCountEmployeeQuery
+} = attendanceApi;
